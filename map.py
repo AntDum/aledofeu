@@ -130,6 +130,7 @@ class Map:
         self.countdown = 60
         self.countdown_locater = locate.TextBox(font_size = 150)
         self.score = 0
+        self.score_locater = locate.TextBox(x_pos=0,y_pos=0)
         self.safe_zone = 0
         self.freeze_cooldown = 0
         self.tile_size = tile_size
@@ -156,7 +157,6 @@ class Map:
             self.freeze_cooldown = 0
         if(round(self.countdown % 5,1) == 0):
             i = R.randint(0,len(self.destroyable_packages)-1)
-            print("DESTRUCTION !!!!")
             for tile in self.destroyable_packages[i]:
                 tile.kill()
         #Update des éléments
@@ -165,6 +165,9 @@ class Map:
         screen.update_camera(self.player)
         self.countdown_locater.center(screen.surface).move(y=-250)
         self.countdown_locater.change_text(str(int(self.countdown)))
+        self.score_locater.change_text(f"Score : {self.score}")
+        self.score_locater.render()
+        self.countdown_locater.render()
 
 
     def add_tile(self, tile):
@@ -241,3 +244,4 @@ class Map:
             sprite.draw(screen)
         self.player.draw(screen, dt)
         self.countdown_locater.print(screen)
+        self.score_locater.print(screen)
