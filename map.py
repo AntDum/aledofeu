@@ -5,7 +5,7 @@ import random as R
 import locate
 
 """List des tokens
-    
+
     0 = Vide
     1 = Sol
     10 = mur
@@ -27,36 +27,52 @@ def map_from_file(filename, tile_size=32):
     map_token = gen_level(filename)
     map = Map()
     map.height_tile = len(map_token)
+    new_destroyable_pack = True #Boolean used to detect packs of burning floor.
     map.width_tile = len(map_token[0])
     for y, etage in enumerate(map_token):
         map.width_tile = max(map.width_tile, len(etage))
-        
-        for x, token in enumerate(etage):         
+
+        for x, token in enumerate(etage):
             if token.startswith("0"): # Vide
-                pass
+                new_destroyable_pack = True
             elif token.startswith("1"):
                 if token == "1":#Sol
                     map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                    new_destroyable_pack = True
                 elif token == "10" or token =='12':#Murs
                     map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                    new_destroyable_pack = True
                 elif token == "11":#Murs cassables
                     map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                    new_destroyable_pack = True
             elif token.startswith("2"): # Sol destructibles
-                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))        
+                new_tile = MovableObject(x,y,tile_size=tile_size,map=map)
+                if(new_destroyable_pack):
+                    map.destroyable_packages.append(pg.sprite.Group())
+                    new_destroyable_pack = False
+                map.destroyable_packages[-1].add(new_tile)
+                map.add_tile(new_tile)
             elif token.startswith("3"): # Furnitures
                 map.add_tile(Furniture(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
             elif token.startswith("4"): # Contenur
                 map.add_tile(Container(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
             elif token.startswith("5"): # Seaux
                 map.add_tile(WaterBucket(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
             elif token.startswith("6"): # échelles
                 map.add_tile(Liftable(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
             elif token.startswith("7"): # incendie
                 map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map,is_fire=True, is_hard=False))
+                new_destroyable_pack = True
             elif token.startswith("8"): # Spawn player
                 map.player.set_pos(x,y)
+                new_destroyable_pack = True
             elif token.startswith("9"): # Point de depot
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
                 map.safe_zone = x*tile_size
     return map
 
@@ -91,31 +107,34 @@ class Map:
         self.liftable_tiles = pg.sprite.Group()
         self.containers_tiles = pg.sprite.Group()
         self.tiles_collider = pg.sprite.Group()
+        self.destroyable_packages = []
         self.width_tile = 0
         self.height_tile = 0
         self.player = Player(tile_size = tile_size, map=self)
-        
+
 
     def freeze(self,lap):
         self.freeze_cooldown += lap
-    
+
     def update(self, screen, dt):
         #Gestion du compteur
         if(self.freeze_cooldown > 0):
-            # print('Feu éteint, en cours de reprise...')
             self.freeze_cooldown -= dt
         else:
-            # print("Le feu brûle")
             self.countdown -= dt
             self.freeze_cooldown = 0
-
+        if(self.countdown % 5 == 0):
+            i = R.randint(len(self.destroyable_packages))
+            print("DESTRUCTION !!!!")
+            self.destroyable_packages[i].kill()
+        #Update des éléments
         self.tiles.update(dt)
         self.player.update(dt)
         screen.update_camera(self.player)
         self.countdown_locater.center(screen.surface).move(y=-250)
         self.countdown_locater.change_text(str(int(self.countdown)))
 
-    
+
     def add_tile(self, tile):
         self.tiles.add(tile)
         if(tile.is_hard):
@@ -153,8 +172,8 @@ class Map:
                 entity.vel.y = 0
                 entity.rect.y = entity.pos.y
         return hit_dir
-    
-    
+
+
     def collide_with_tile(self, entity, group):
         """[summary]
 
@@ -176,7 +195,7 @@ class Map:
                 hit_dir.append("E")
             elif entity.vel.x < 0:
                 hit_dir.append("W")
-                
+
             if entity.vel.y > 0:
                 hit_dir.append("S")
             elif entity.vel.y < 0:
@@ -190,4 +209,3 @@ class Map:
             sprite.draw(screen)
         self.player.draw(screen, dt)
         self.countdown_locater.print(screen)
-
