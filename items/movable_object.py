@@ -24,8 +24,8 @@ table_sprite = get_image("table", (TILES_SIZE,TILES_SIZE))
 swordFish_oicture_sprite = get_image("swordfish_picture", (TILES_SIZE,TILES_SIZE))
 grassPicture_sprite = get_image("grass_picture", (TILES_SIZE,TILES_SIZE))
 
-fires = [get_image_fire(f"fire{i}", ((TILES_SIZE), (TILES_SIZE))) for i in range(1,7)]
-waterBucket = get_image_fire("water_bucket", (TILES_SIZE,TILES_SIZE))
+fires_sprite = [get_image_fire(f"fire{i}", ((TILES_SIZE), (TILES_SIZE))) for i in range(1,7)]
+waterBucket_sprite = get_image_fire("water_bucket", (TILES_SIZE,TILES_SIZE))
 
 
 
@@ -38,13 +38,10 @@ class MovableObject(pg.sprite.Sprite):
         super().__init__()
         
         self.tile_size = tile_size
-        self.liftable = False
         if image == None:
             self.image = pg.Surface((tile_size,tile_size))
             if is_fire:
                 self.image.fill((0,255,0))
-            else:    
-                self.image.fill((48,212,32))
         else:
             self.image = image
         
@@ -54,6 +51,7 @@ class MovableObject(pg.sprite.Sprite):
         
         self.rect = self.image.get_rect()
         self.prev_rect = self.rect
+        self.liftable = False
         
         self.pos = pg.Vector2(x*tile_size, y*tile_size)
         
@@ -112,8 +110,7 @@ class Liftable(MovableObject):
     Class for buckets and furnitures that can be lifted by the players
     """
     def __init__(self, x=0, y=0, image=None, tile_size=32, map=None):
-        super().__init__(x, y, image, tile_size, is_hard=False, is_liftable=True, map=map)
-        self.image.fill((212,48,32))
+        super().__init__(x, y, image=image,tile_size=tile_size, is_hard=False, is_liftable=True, map=map)
         self.speedfact_x = 25
         self.speedfact_y = 45
 
@@ -121,8 +118,8 @@ class WaterBucket(Liftable):
     """
     Class for buckets and furnitures that can be lifted by the players
     """
-    def __init__(self, x=0, y=0, image=None, tile_size=32, map=None):
-        super().__init__(x, y, waterBucket, tile_size, map)
+    def __init__(self, x=0, y=0, tile_size=32, map=None):
+        super().__init__(x, y, image=waterBucket_sprite, tile_size=tile_size, map=map)
     
     def extinguish(self,fire_core):
         print("Extinction du feu")
@@ -137,8 +134,8 @@ class WaterBucket(Liftable):
             self.extinguish(fire_collided[0])
 
 class Furniture(Liftable):
-    def __init__(self, x=0, y=0, image=None, tile_size=32, map=None, value = 0):
-        super().__init__(x, y, image, tile_size, map)
+    def __init__(self, x=0, y=0, tile_size=32, map=None, value = 0):
+        super().__init__(x, y, image=chairLeft_sprite, tile_size=tile_size, map=map)
         self.is_saved = False
         self.value = value
     
@@ -158,9 +155,15 @@ class Container(MovableObject):
     """
     Class for all furnitures that can be looted by the player
     """
-    def __init__(self, x=0, y=0, image=None, tile_size=32, map=None):
-        super().__init__(x, y, image, tile_size, is_hard=False, map=map,is_container = True)
-        self.image.fill((48,32,212))
+    def __init__(self, x=0, y=0, tile_size=32, map=None):
+        super().__init__(x, y, tile_size=tile_size, is_hard=False, map=map,is_container = True)
 
     def interact(self):
         self.map.score += R.randint(0,30)
+
+class FixObject(MovableObject):
+    def __init__(self, x=0, y=0, tile_size=32, map=None, object_type=0):
+        image = None
+        if object_type == 0:
+            image = wall_sprite
+        super().__init__(x,y, image=image, tile_size=tile_size, map=None)

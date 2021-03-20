@@ -1,6 +1,6 @@
 import pygame as pg
 from items.player import Player
-from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture
+from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture,FixObject
 import random as R
 import locate
 
@@ -36,13 +36,13 @@ def map_from_file(filename, tile_size=32):
                 pass
             elif token.startswith("1"):
                 if token == "1":#Sol
-                    map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map))
+                    map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
                 elif token == "10" or token =='12':#Murs
-                    map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map, image=pg.Surface((tile_size, tile_size))))
+                    map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
                 elif token == "11":#Murs cassables
-                    map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map))
+                    map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
             elif token.startswith("2"): # Sol destructibles
-                map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map))        
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))        
             elif token.startswith("3"): # Furnitures
                 map.add_tile(Furniture(x,y,tile_size=tile_size,map=map))
             elif token.startswith("4"): # Contenur
@@ -56,7 +56,7 @@ def map_from_file(filename, tile_size=32):
             elif token.startswith("8"): # Spawn player
                 map.player.set_pos(x,y)
             elif token.startswith("9"): # Point de depot
-                map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map))
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
                 map.safe_zone = x*tile_size
     return map
 
