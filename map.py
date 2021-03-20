@@ -123,10 +123,12 @@ class Map:
         else:
             self.countdown -= dt
             self.freeze_cooldown = 0
-        if(self.countdown % 5 == 0):
-            i = R.randint(len(self.destroyable_packages))
+        print(round(self.countdown % 5,3))
+        if(round(self.countdown % 5,1) == 0):
+            i = R.randint(0,len(self.destroyable_packages)-1)
             print("DESTRUCTION !!!!")
-            self.destroyable_packages[i].kill()
+            for tile in self.destroyable_packages[i]:
+                tile.kill()
         #Update des éléments
         self.tiles.update(dt)
         self.player.update(dt)
