@@ -156,7 +156,7 @@ class Container(MovableObject):
     Class for all furnitures that can be looted by the player
     """
     def __init__(self, x=0, y=0, tile_size=32, map=None):
-        super().__init__(x, y, tile_size=tile_size, is_hard=False, map=map,is_container = True)
+        super().__init__(x, y, image=cooker_sprite,tile_size=tile_size, is_hard=False, map=map, is_container=True)
 
     def interact(self):
         self.map.score += R.randint(0,30)
@@ -167,3 +167,4 @@ class FixObject(MovableObject):
         if object_type == 0:
             image = wall_sprite
         super().__init__(x,y, image=image, tile_size=tile_size, map=None)
+
