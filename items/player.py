@@ -23,7 +23,7 @@ class Player(movable_object.MovableObject):
         self.touch_ground = True
         self.last_push = -100
         self.looking_right = True
-    
+
     def update(self, dt):
         self.vel.y += self.gravity * 50
         fact_x = 35
@@ -31,7 +31,7 @@ class Player(movable_object.MovableObject):
         if self.inventory:
             fact_x = self.inventory.speedfact_x
             fact_y = self.inventory.speedfact_y
-            
+
         self.get_keys(fact_x, fact_y)
         self.pos.x += self.vel.x * dt
         self.pos.y += self.vel.y * dt
@@ -42,16 +42,16 @@ class Player(movable_object.MovableObject):
             self.touch_ground = True
         else:
             self.touch_ground = False
-        
+
         if(self.inventory):
             padding_y = -1 * self.tile_size
             self.inventory.pos.x = self.pos.x
             self.inventory.pos.y = self.pos.y + padding_y
             self.inventory.update_end()
-        
-            
+
+
         super().update_end(dt)
-    
+
     def draw(self, screen, dt):
         ite = self.iteration * dt * 10
         padding = self.tile_size*(4/17)
@@ -62,12 +62,12 @@ class Player(movable_object.MovableObject):
         else:
             self.image = player_sprite_idle
             padding = self.tile_size*(2/17)
-        
+
         if(self.inventory):
             self.inventory.draw(screen)
         super().draw(screen, (padding,0))
 
-    
+
     def interact(self):
         """
         If the player is on a furniture and has nothing in his inventory, the furniture is removed from the map
@@ -85,6 +85,8 @@ class Player(movable_object.MovableObject):
             used_tile.has_gravity = False
             return True
         used_tile = pg.sprite.spritecollide(self, self.map.containers_tiles, False)
+        if(used_tile and used_tile[0].is_container):
+            used_tile[0].open()
 
     def drop(self):
         """
