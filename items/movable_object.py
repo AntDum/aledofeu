@@ -1,5 +1,6 @@
 import pygame as pg
 import os
+import random as R
 
 TILES_SIZE = 32
 
@@ -32,11 +33,11 @@ waterBucket_sprite = get_image_fire("water_bucket", (TILES_SIZE,TILES_SIZE))
 
 
 class MovableObject(pg.sprite.Sprite):
-    
+
     def __init__(self, x=0, y=0, image=None, tile_size=32, is_hard=True, is_liftable=False,
                  is_fire = False, gravity=0.75, has_gravity=False,is_container = False, map=None):
         super().__init__()
-        
+
         self.tile_size = tile_size
         if image == None:
             self.image = pg.Surface((tile_size,tile_size))
@@ -44,37 +45,37 @@ class MovableObject(pg.sprite.Sprite):
                 self.image.fill((0,255,0))
         else:
             self.image = image
-        
+
         self.gravity = gravity
         self.vel = pg.math.Vector2(0,0)
         self.has_gravity = has_gravity
-        
+
         self.rect = self.image.get_rect()
         self.prev_rect = self.rect
         self.liftable = False
-        
+
         self.pos = pg.Vector2(x*tile_size, y*tile_size)
-        
+
         self.is_hard = is_hard
         self.is_fire = is_fire
         self.is_container = is_container
         self.is_liftable = is_liftable
         self.is_dirty = False
-        
+
         # self.speedfact_x = 50
         # self.speedfact_y = 50
-        
+
         self.map = map
-        
+
         self.iteration = 0
-        
+
         self.update_end()
-    
+
     def update(self, dt):
         self.update_middle(dt)
         self.update_end(dt)
-    
-    
+
+
     def update_middle(self, dt=1):
         #Calcul la nouvelle position.
         self.pos.x += self.vel.x * dt * 3.1
@@ -88,15 +89,15 @@ class MovableObject(pg.sprite.Sprite):
                 self.has_gravity = False
             self.map.collide_block_with_tile(self, 'x')
 
-                
 
-                
+
+
     def update_end(self, dt=1):
         #Le reste mdr
         self.rect.x = int(self.pos.x)
         self.rect.y = int(self.pos.y)
         self.iteration += 1
-    
+
     def draw(self, screen, padding=(0,0)):
         screen.blit_cam(self.image, self.rect.move(padding))
 
@@ -120,7 +121,7 @@ class WaterBucket(Liftable):
     """
     def __init__(self, x=0, y=0, tile_size=32, map=None):
         super().__init__(x, y, image=waterBucket_sprite, tile_size=tile_size, map=map)
-    
+
     def extinguish(self,fire_core):
         print("Extinction du feu")
         self.map.freeze(5)
@@ -138,13 +139,13 @@ class Furniture(Liftable):
         super().__init__(x, y, image=chairLeft_sprite, tile_size=tile_size, map=map)
         self.is_saved = False
         self.value = value
-    
+
     def get_saved(self):
         self.map.score += self.value
         print(self.map.score)
         self.is_saved = True
         self.liftable = False
-    
+
     def update_middle(self,dt = 1):
         super().update_middle(dt=dt)
         if(self.pos.x > self.map.safe_zone and not self.is_saved):
@@ -158,8 +159,9 @@ class Container(MovableObject):
     def __init__(self, x=0, y=0, tile_size=32, map=None):
         super().__init__(x, y, image=cooker_sprite,tile_size=tile_size, is_hard=False, map=map, is_container=True)
 
-    def interact(self):
+    def open(self):
         self.map.score += R.randint(0,30)
+        self.kill()
 
 class FixObject(MovableObject):
     def __init__(self, x=0, y=0, tile_size=32, map=None, object_type=0):
