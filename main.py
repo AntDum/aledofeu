@@ -51,8 +51,8 @@ def main():
         #draw
         # pg.display.update(map.draw(screen))           
         screen.blit(background, (0,0))
-        map.draw(screen)
-        screen.draw_grid()
+        map.draw(screen, dt)
+        # screen.draw_grid()
         
         
         #update screen

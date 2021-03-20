@@ -110,7 +110,7 @@ class TextBox:
         """
         window_size = window.get_size()
         box_size = self.box_size
-        print(box_size)
+        # print(box_size)
         self.move_to((window_size[0]-box_size[0])//2,(window_size[1]-box_size[1])//2)
         return self
 

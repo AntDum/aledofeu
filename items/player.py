@@ -4,11 +4,12 @@ import os
 
 TILES_SIZE = 32
 
-def get_image(name):
-    return pg.transform.scale(pg.image.load(os.path.join("res",f"{name}.png")), (TILES_SIZE, TILES_SIZE))
+def get_image(name, scale):
+    return pg.transform.scale(pg.image.load(os.path.join("res",f"{name}.png")), scale)
 
-player_sprite_left = [get_image(f"walk_left_{i}") for i in range(3)]
-player_sprite_right = [get_image(f"walk_right_{i}") for i in range(3)]
+player_sprite_left = [get_image(f"walk_left_{i}", ((TILES_SIZE*11)//17, (TILES_SIZE*17)//17)) for i in range(3)]
+player_sprite_right = [get_image(f"walk_right_{i}", ((TILES_SIZE*11)//17, (TILES_SIZE*17)//17)) for i in range(3)]
+player_sprite_idle = get_image("idle", ((TILES_SIZE*14)//17, (TILES_SIZE*17)//17))
 
 
 class Player(movable_object.MovableObject):
@@ -20,11 +21,12 @@ class Player(movable_object.MovableObject):
         self.touch_ground = True
         self.last_push = -100
         self.image = player_sprite_left[0]
+        self.looking_right = True
     
     def update(self, dt):
         super().update_init(dt)
         self.vel.y += self.gravity * 50
-        fact_x = 50
+        fact_x = 35
         fact_y = 50
         if self.inventory:
             fact_x = self.inventory.speedfact_x
@@ -48,12 +50,19 @@ class Player(movable_object.MovableObject):
             self.inventory.pos.x = self.pos.x + padding_x
             self.inventory.pos.y = self.pos.y + padding_y
             self.inventory.update_end()
+        
             
         super().update_end(dt)
     
-    def draw(self, screen):
-        if self.vel.x > 0:
-            pass
+    def draw(self, screen, dt):
+        ite = self.iteration * dt * 10
+        if self.vel.x < 0:
+            self.image = player_sprite_left[int(ite % 3)]
+        elif self.vel.x > 0:
+            self.image = player_sprite_right[int(ite % 3)]
+        else:
+            self.image = player_sprite_idle
+        
         if(self.inventory):
             self.inventory.draw(screen)
         super().draw(screen)

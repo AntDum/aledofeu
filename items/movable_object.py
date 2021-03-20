@@ -69,7 +69,7 @@ class Liftable(MovableObject):
     def __init__(self, x=0, y=0, image=None, tile_size=32, map=None):
         super().__init__(x, y, image, tile_size, is_hard=False, is_liftable=True, map=map)
         self.image.fill((212,48,32))
-        self.speedfact_x = 30
+        self.speedfact_x = 25
         self.speedfact_y = 40
         
 class Container(MovableObject):

@@ -155,9 +155,9 @@ class Map:
                 entity.rect.y = entity.pos.y
         return hit_dir
 
-    def draw(self, screen):
+    def draw(self, screen, dt):
         for sprite in self.tiles.sprites():
             sprite.draw(screen)
-        self.player.draw(screen)
+        self.player.draw(screen, dt)
         self.countdown_locater.print(screen)
 
