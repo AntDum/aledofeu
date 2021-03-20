@@ -25,7 +25,6 @@ class Player(movable_object.MovableObject):
         self.looking_right = True
     
     def update(self, dt):
-        super().update_init(dt)
         self.vel.y += self.gravity * 50
         fact_x = 35
         fact_y = 50
@@ -37,15 +36,14 @@ class Player(movable_object.MovableObject):
         self.pos.x += self.vel.x * dt
         self.pos.y += self.vel.y * dt
         self.rect.x = self.pos.x
-        self.map.collide_with_tile(self, 'x')
+        self.map.collide_block_with_tile(self, 'x')
         self.rect.y = self.pos.y
-        if (self.map.collide_with_tile(self, 'y')) == "S":
+        if (self.map.collide_block_with_tile(self, 'y')) == "S":
             self.touch_ground = True
         else:
             self.touch_ground = False
         
         if(self.inventory):
-            self.inventory.update_init()
             padding_y = -1 * self.tile_size
             self.inventory.pos.x = self.pos.x
             self.inventory.pos.y = self.pos.y + padding_y
@@ -70,21 +68,23 @@ class Player(movable_object.MovableObject):
         super().draw(screen, (padding,0))
 
     
-    def lift(self):
+    def interact(self):
         """
         If the player is on a furniture and has nothing in his inventory, the furniture is removed from the map
         and placed in the inventory.
         """
-        to_lift = pg.sprite.spritecollide(self, self.map.soft_tiles, False)
-        if(to_lift and to_lift[0].is_liftable):
-            to_lift = to_lift[0]
-            to_lift.kill()
-            to_lift.is_dirty = True
+        used_tile = pg.sprite.spritecollide(self, self.map.liftable_tiles, False)
+        if(used_tile and used_tile[0].is_liftable):
+            used_tile = used_tile[0]
+            used_tile.kill()
+            used_tile.is_dirty = True
             padding_y = -1 * self.tile_size
-            self.inventory = to_lift
+            self.inventory = used_tile
             self.inventory.pos.x = self.pos.x
             self.inventory.pos.y = self.pos.y + padding_y
-            to_lift.has_gravity = False
+            used_tile.has_gravity = False
+            return True
+        used_tile = pg.sprite.spritecollide(self, self.map.containers_tiles, False)
 
     def drop(self):
         """
@@ -107,7 +107,7 @@ class Player(movable_object.MovableObject):
                 if(self.inventory):
                     self.drop()
                 else:
-                    self.lift()
+                    self.interact()
         self.vel.x = (keys[pg.K_RIGHT] - keys[pg.K_LEFT]) * self.speed * fact_x
         # self.vel.y = (keys[pg.K_DOWN] - keys[pg.K_UP]) * self.speed
         if self.touch_ground:
