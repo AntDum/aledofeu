@@ -20,6 +20,25 @@ import locate
     9 = point de placage pour secure les items
 """
 
+tokens = {
+    "0" : "empty",
+    "1" : "ground",
+    "10": "wall",
+    "12": "wall",
+    "11": "wall destructible",
+    "2" : "ground destructible",
+    "3" : "items",
+    "4" : "container",
+    "5" : "seau",
+    "6" : "echelle",
+    "7" : "fireplace",
+    "8" : "spawn player",
+    "9" : "safer"
+}
+
+
+
+
 def map_from_file(filename, tile_size=32):
     """
     From a csv file, returns a map.
@@ -33,47 +52,59 @@ def map_from_file(filename, tile_size=32):
         map.width_tile = max(map.width_tile, len(etage))
 
         for x, token in enumerate(etage):
-            if token.startswith("0"): # Vide
+            token = tokens[token]
+            if token == "empty": # Vide
                 new_destroyable_pack = True
-            elif token.startswith("1"):
-                if token == "1":#Sol
-                    map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
-                    new_destroyable_pack = True
-                elif token == "10" or token =='12':#Murs
-                    map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
-                    new_destroyable_pack = True
-                elif token == "11":#Murs cassables
-                    map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
-                    new_destroyable_pack = True
-            elif token.startswith("2"): # Sol destructibles
+                
+            elif token == "ground":#Sol
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+                
+            elif token == "wall":#Murs
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+                
+            elif token == "wall destructible":#Murs cassables
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+                
+            elif token == "ground destructible": # Sol destructibles
                 new_tile = MovableObject(x,y,tile_size=tile_size,map=map)
                 if(new_destroyable_pack):
                     map.destroyable_packages.append(pg.sprite.Group())
                     new_destroyable_pack = False
                 map.destroyable_packages[-1].add(new_tile)
                 map.add_tile(new_tile)
-            elif token.startswith("3"): # Furnitures
+                
+            elif token == "items": # Furnitures
                 map.add_tile(Furniture(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
-            elif token.startswith("4"): # Contenur
+                
+            elif token == "container": # Contenur
                 map.add_tile(Container(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
-            elif token.startswith("5"): # Seaux
+                
+            elif token == "seau": # Seaux
                 map.add_tile(WaterBucket(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
-            elif token.startswith("6"): # échelles
+                
+            elif token == "echelle": # échelles
                 map.add_tile(Liftable(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
-            elif token.startswith("7"): # incendie
+                
+            elif token == "fireplace": # incendie
                 map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map,is_fire=True, is_hard=False))
                 new_destroyable_pack = True
-            elif token.startswith("8"): # Spawn player
-                map.player.set_pos(x,y)
-                new_destroyable_pack = True
-            elif token.startswith("9"): # Point de depot
+                
+            elif token == "safer": # Point de depot
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
                 map.safe_zone = x*tile_size
+                
+            elif token == "spawn player": # Spawn player
+                map.player.set_pos(x,y)
+                new_destroyable_pack = True
+                
     return map
 
 def gen_level(filename):
