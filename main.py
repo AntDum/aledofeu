@@ -16,7 +16,6 @@ def main():
     clock = pg.time.Clock() 
     
     pg.display.set_caption("Aledofeu")
-    
     background = pg.Surface([WIDTH, HEIGHT])
     background.fill((200,200,200))
 

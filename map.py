@@ -88,7 +88,9 @@ class Map:
     def __init__(self, tile_size=32):
         self.countdown = 60
         self.countdown_locater = locate.TextBox(font_size = 150)
+        self.score = 0
         self.frozen_timer = False
+        self.freeze_cooldown = 0
         self.tile_size = tile_size
         self.tiles = pg.sprite.Group()
         self.soft_tiles = pg.sprite.Group()
@@ -96,24 +98,20 @@ class Map:
         self.width_tile = 0
         self.height_tile = 0
         self.player = Player(tile_size = tile_size, map=self)
-        # for y in range(len(map_id)):
-        #     for x in range(len(map_id[y])):
-        #         if map_id[y][x] == '1':
-        #             tile = Tile(x,y)
-        #             self.tiles.add(tile)
-        #             self.tiles_collider.add(tile)
-        #         elif map_id[y][x] == 'MP':
-        #             self.player = Player(x,y)
+        
 
-    def tile_pos(self,x,y):
-        """
-        Returns the tile containing the point (x,y)
-        """
-        for tile in self.tiles.sprites():
-            pass
-
+    def freezeCountdown(self,lap):
+        self.frozen_timer = True
+        self.freeze_cooldown = lap
+    
     def update(self, screen, dt):
-        self.countdown -= dt
+        if(self.freeze_cooldown > 0):
+            self.freeze_cooldown -= dt
+            if (self.frozen_timer):
+                self.frozen_timer = False
+        if(not self.frozen_timer):
+            self.countdown -= dt
+
         self.tiles.update(dt)
         self.player.update(dt)
         screen.update_camera(self.player)

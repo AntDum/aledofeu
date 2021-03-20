@@ -24,6 +24,7 @@ class MovableObject(pg.sprite.Sprite):
         
         self.is_hard = is_hard
         self.is_liftable = is_liftable
+        self.is_dirty = False
         
         # self.speedfact_x = 50
         # self.speedfact_y = 50
@@ -43,19 +44,25 @@ class MovableObject(pg.sprite.Sprite):
         self.prev_rect = pg.Rect(self.rect)
     
     def update_middle(self, dt=1):
-        if self.has_gravity:
+        self.pos.x += self.vel.x * dt * 3.1
+        self.vel.x = round(self.vel.x * 0.85, 3)
+        if abs(self.vel.x) < 0.1:
+            self.vel.x = 0
+        if self.vel.x != 0 or self.has_gravity:
             self.vel.y += self.gravity
-            self.pos += self.vel * dt * 50
+            self.pos.y += self.vel.y * dt * 50
             if (self.map.collide_with_tile(self, 'y')) == "S":
                 self.has_gravity = False
+            self.map.collide_with_tile(self, 'x')
+
                 
     def update_end(self, dt=1):
         self.rect.x = int(self.pos.x)
         self.rect.y = int(self.pos.y)
         self.iteration += 1
     
-    def draw(self, screen):
-        screen.blit_cam(self.image, self.rect)
+    def draw(self, screen, padding=(0,0)):
+        screen.blit_cam(self.image, self.rect.move(padding))
 
     def set_pos(self, x, y):
         self.pos.x = x * self.tile_size
@@ -70,7 +77,7 @@ class Liftable(MovableObject):
         super().__init__(x, y, image, tile_size, is_hard=False, is_liftable=True, map=map)
         self.image.fill((212,48,32))
         self.speedfact_x = 25
-        self.speedfact_y = 40
+        self.speedfact_y = 45
         
 class Container(MovableObject):
     """
