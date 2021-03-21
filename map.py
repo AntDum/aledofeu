@@ -15,7 +15,6 @@ je_crash = False
 # C'est moche mais dans le fond c'est pas grave
 # =================================================
 
-print(platform.system())
 if platform.system() == "Windows":
     pg.mixer.init()
 else:
@@ -67,8 +66,8 @@ tokens = {
     "30": "ground",
     "40": "wall destructible",
     "1" : "tab1", "11" : "tab2", "21" : "tab3",
-    "31": "chaiseG","41":"chaiseD","51" : "table", "61" : "etagere",
-    "2" : "seau", "21" : "echelle",
+    "31": "chaiseG", "41":"chaiseD", "51" : "table", "61" : "etagere",
+    "2" : "seau", "14" : "echelle",
     "3" : "lit", "13" : "coffre" , "23" : "four" , "33" : "frigo",
     "4" : "fireplace",
     "5" : "spawn player",
@@ -122,33 +121,37 @@ def map_from_file(filename, tile_size=32):
 
             elif token == "tab1": # Tableau tier 1
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
-                if(R.randint(1,3)>1):
+                if(R.randint(1,4)>1):
                     map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 10))
                 new_destroyable_pack = True
             elif token == "tab2": # Tableau tier 2
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
-                if(R.randint(1,3)>1):
+                if(R.randint(1,4)>1):
                     map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 11))
                 new_destroyable_pack = True
             elif token == "tab3": # Tableau tier 3
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
-                if(R.randint(1,3)>1):
-                    map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 13))
+                if(R.randint(1,4)>1):
+                    map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 12))
                 new_destroyable_pack = True
             elif token == "chaiseG": # Chaise
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
-                if(R.randint(1,3)>1):
+                if(R.randint(1,4)>1):
                     map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 20))
                 new_destroyable_pack = True
             elif token == "chaiseD": # Chaise
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
-                if(R.randint(1,3)>1):
+                if(R.randint(1,4)>1):
                     map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 21))
                 new_destroyable_pack = True
             elif token == "table": # Table
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
-                if(R.randint(0,3)>1):
+                if(R.randint(0,4)>1):
                     map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 22))
+                new_destroyable_pack = True
+            elif token == "etagere": # Table
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 23))
                 new_destroyable_pack = True
 
             elif token == "lit": # Lit

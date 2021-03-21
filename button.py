@@ -43,7 +43,7 @@ class Button:
         if scale:
             self.sprite = pg.transform.scale(sprite,(scale))
         else:
-            self.sprite = pg.transform.scale(sprite,(self.text_box_name.text_size[0],self.text_box_name.text_size[1]))
+            self.sprite = sprite
         self.shift = shift
         self.area = self.sprite.get_rect()
 

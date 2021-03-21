@@ -22,6 +22,7 @@ bed_sprite = get_tile("bed_picture")
 cooker_sprite = get_tile("cooker")
 fridge_sprite = get_tile("fridge")
 grass_sprite = get_tile("grassMid")
+shelf_sprite = get_tile("shelf")
 ladder_sprite = get_tile("ladder_mid")
 ladderTop_sprite = get_tile("ladder_top")
 poele_sprite = get_tile("poele")
@@ -75,7 +76,7 @@ class MovableObject(pg.sprite.Sprite):
         self.iteration = 0
 
         self.update_end()
-    
+
     def kill(self):
         if self.particle != None:
             self.particle.has_finish = True
@@ -114,7 +115,7 @@ class MovableObject(pg.sprite.Sprite):
     def set_pos(self, x, y):
         self.pos.x = x * self.tile_size
         self.pos.y = y * self.tile_size
-    
+
     def use(self):
         pass
 
@@ -148,7 +149,7 @@ class WaterBucket(Liftable):
         fire_collided = self.map.collide_with_tile(self,self.map.fire_tiles)
         if(fire_collided[0]!=None):
             self.extinguish(fire_collided[0])
-            
+
 
 class Furniture(Liftable):
     def __init__(self, x=0, y=0, tile_size=32, map=None, kind = 1):
@@ -159,7 +160,7 @@ class Furniture(Liftable):
                 sprite = swordFish_picture_sprite
             else:
                 sprite = grassPicture_sprite
-                
+
         elif kind == 11: # Tableau tier 2
             self.value = 10
             if R.random() > 0.5:
@@ -178,9 +179,12 @@ class Furniture(Liftable):
         elif kind == 22: # Table
             self.value = 20
             sprite = table_sprite
+        elif kind == 23:
+            self.value = 30
+            sprite = shelf_sprite
         else:
             sprite = None
-            self.value = 0    
+            self.value = 0
         super().__init__(x, y, image=sprite, tile_size=tile_size, map=map)
 
     def get_saved(self):
@@ -198,7 +202,7 @@ class Furniture(Liftable):
             self.kill()
             self.map.add_particle_fire(self.rect.centerx, self.rect.centery)
             self.map.play_effect("destruction")
-            
+
         if(self.pos.x > self.map.safe_zone and not self.is_saved):
             self.get_saved()
 
@@ -254,13 +258,13 @@ class FixObject(MovableObject):
 class FireCore(MovableObject):
     def __init__(self, x=0, y=0, tile_size=32, map=None):
         super().__init__(x,y, image=fires_sprite[0], tile_size=tile_size, map=None, is_hard=False, is_fire=True)
-    
+
     def update(self, dt):
         self.update_middle()
         ite = self.iteration * dt * 10
         self.image = fires_sprite[int(ite % 6)]
         self.update_end()
-        
+
 
 class Ladder(Liftable):
     def __init__(self, x=0, y=0, tile_size=32, map=None, item=True):
@@ -283,4 +287,3 @@ class Ladder(Liftable):
             self.kill()
             self.map.add_particle_fire(self.rect.centerx, self.rect.centery)
             self.map.play_effect("destruction")
-            

@@ -16,6 +16,7 @@ def replay():
 def do_not_replay():
     return False,False
 
+
 def main():
     pg.init()
     run = True
@@ -23,6 +24,7 @@ def main():
     clock = pg.time.Clock()
 
     pg.display.set_caption("Adledofeu")
+    pg.display.set_icon(pg.image.load(os.path.join("res","ico.png")))
     background = pg.Surface([WIDTH, HEIGHT])
     background.fill((135,206,235))
 
@@ -91,10 +93,7 @@ def main():
 
 
     pg.quit() #quit le module pygame
-    return new_game_wanted
 
+    print(f"Ton score était {map.score}")
 
-
-playing = True
-while playing:
-    playing = main()
+main()
