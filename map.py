@@ -17,7 +17,7 @@ sound_fire_extinguish = get_effect("drop_water", 0.5)
 sound_throw = get_effect("throw", 0.5)
 sound_destruction = get_effect("destruction", 0.5)
 sound_explosion = get_effect("destruction", 0.5)
-sound_jump = get_effect("jump", 0.5)
+sound_jump = get_effect("jump", 0.3)
 sound_land = get_effect("land", 0.1)
 
 
