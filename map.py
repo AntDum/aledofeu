@@ -38,7 +38,7 @@ sound_tick = get_effect("tick", 0.1)
 music_background = get_music("sound", 0.1)
 
 score_background = get_image("score_ui", (200,40))
-fire_background = get_image("fire_background", (300,300))
+fire_background = get_image("fire_background", (250,250))
 
 
 tokens = {
@@ -195,7 +195,7 @@ class Map:
         self.countdown_locater = locate.TextBox(font_size = 150)
         self.countdown_locater.change_font_from_file("terminal-grotesque_open")
         self.score = 0
-        self.score_locater = locate.TextBox(x_pos=0,y_pos=0)
+        self.score_locater = locate.TextBox(x_pos=20,y_pos=20)
         self.score_locater.change_font_from_file("terminal-grotesque_open",font_size = 40,color = (0,0,0))
         self.safe_zone = 0
         self.freeze_cooldown = 0
@@ -255,7 +255,7 @@ class Map:
         self.score_locater.change_text(f"Score : {self.score}")
         self.score_locater.render()
         self.countdown_locater.render()
-        self.countdown_locater.center(screen.surface).move(y=-240)
+        self.countdown_locater.center(screen.surface).move(y=-200)
         self.countdown_locater.render()
 
 
@@ -336,18 +336,18 @@ class Map:
         self.player.draw(screen, dt)
         for particle in self.particles:
             particle.draw(screen)
-        screen.blit(score_background,(0,0))
-        screen.blit(fire_background,(screen.get_size()[0]-150,15))
+        screen.blit(score_background,(15,15))
+        screen.blit(fire_background,((screen.get_size()[0]//2)-125,-60))
         self.countdown_locater.print(screen)
         self.score_locater.print(screen)
-    
+
     def add_ladder(self, x, y):
         x /= self.tile_size
         y /= self.tile_size
         for i in range(4):
             self.add_tile(Ladder(x, y-i, tile_size=self.tile_size,map=self, item=False))
-        
-        
+
+
     def add_particle_firework(self, x, y):
         self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1,
                         missile_size=self.tile_size//4, particule_size=self.tile_size//16))
@@ -363,7 +363,7 @@ class Map:
 
     def add_particle_reward(self, x, y):
                self.particles.append(particleEffect.RewardExplosion(x, y, size=self.tile_size//16).explode())
-        
+
     def play_effect(self, effect):
         if effect == "jump":
             sound_jump.play()
