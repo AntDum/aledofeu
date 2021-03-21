@@ -9,6 +9,7 @@ HEIGHT = 600
 FPS_MAX = 60
 TILES_SIZE = 32
 
+
 def main():
     pg.init()
 
