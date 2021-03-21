@@ -85,7 +85,10 @@ def map_from_file(filename, tile_size=32):
                 new_destroyable_pack = True
 
             elif token == "wall destructible":#Murs cassables
-                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                ground = FixObject(x,y,tile_size=tile_size,map=map)
+                map.add_tile(ground)
+                if R.random() > 0.4:
+                    ground.particle = map.add_particle_burn((x + 0.5)*tile_size,(y + 0.5)*tile_size)
                 new_destroyable_pack = True
 
             elif token == "ground destructible": # Sol destructibles
@@ -94,6 +97,8 @@ def map_from_file(filename, tile_size=32):
                     map.destroyable_packages.append(pg.sprite.Group())
                     new_destroyable_pack = False
                 map.destroyable_packages[-1].add(new_tile)
+                if R.random() > 0.4:
+                    new_tile.particle = map.add_particle_burn((x + 0.5)*tile_size,(y + 0.5)*tile_size)
                 map.add_tile(new_tile)
 
             elif token == "tab1": # Tableau tier 1
@@ -191,7 +196,7 @@ class Map:
     def __init__(self, tile_size=32):
         self.countdown = 60
         self.countdown_locater = locate.TextBox(font_size = 150)
-        self.countdown_locater.change_font_from_file("terminal-grotesque_open")
+        self.countdown_locater.change_font_from_file("terminal-grotesque_open",color = (0,0,0))
         self.score = 0
         self.score_locater = locate.TextBox(x_pos=20,y_pos=20)
         self.score_locater.change_font_from_file("terminal-grotesque_open",font_size = 40,color = (0,0,0))
@@ -347,21 +352,36 @@ class Map:
             self.add_tile(Ladder(x, y-i, tile_size=self.tile_size,map=self, item=False))
 
 
-    def add_particle_firework(self, x, y):
-        self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1,
-                        missile_size=self.tile_size//4, particule_size=self.tile_size//16))
+    def add_particle_firework(self, x, y, raw=False):
+        part = particleEffect.FireWork(x,y, timer=0.5, life_time=1,
+                        missile_size=self.tile_size//4, particule_size=self.tile_size//16, raw=raw)
+        self.particles.append(part)
+        return part
 
-    def add_particle_fire(self, x, y):
-        self.particles.append(particleEffect.FireExplosion(x, y, size=self.tile_size//16).explode())
+    def add_particle_fire(self, x, y, raw=False):
+        part = particleEffect.FireExplosion(x, y, size=self.tile_size//16, raw=raw).explode()
+        self.particles.append(part)
+        return part
 
-    def add_particle_smoke(self, x, y):
-        self.particles.append(particleEffect.Smoke(x,y, size=self.tile_size//3).explode())
+    def add_particle_smoke(self, x, y, raw=False):
+        part = particleEffect.Smoke(x,y, size=self.tile_size//3, raw=raw).explode()
+        self.particles.append(part)
+        return part
 
-    def add_particle_land(self, x, y):
-        self.particles.append(particleEffect.LandExplosion(x, y, size=self.tile_size//16).explode())
+    def add_particle_land(self, x, y, raw=False):
+        part = particleEffect.LandExplosion(x, y, size=self.tile_size//16, raw=raw).explode()
+        self.particles.append(part)
+        return part
 
-    def add_particle_reward(self, x, y):
-               self.particles.append(particleEffect.RewardExplosion(x, y, size=self.tile_size//16).explode())
+    def add_particle_reward(self, x, y, raw=False):
+        part = particleEffect.RewardExplosion(x, y, size=self.tile_size//16, raw=raw).explode()
+        self.particles.append(part)
+        return part
+    
+    def add_particle_burn(self, x, y, raw=False):
+        part = particleEffect.Fire(x, y, amount=25, size=self.tile_size//6, raw=raw)
+        self.particles.append(part)
+        return part
 
     def play_effect(self, effect):
         if effect == "jump":

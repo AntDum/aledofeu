@@ -48,6 +48,7 @@ def main():
 
         #update
         map.update(screen, dt)
+        
 
         #draw
         # pg.display.update(map.draw(screen))

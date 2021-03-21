@@ -4,8 +4,8 @@ from random import randint, uniform
 
 
 class FireWork(particleSystem.ParticleSystem):
-    def __init__(self, x, y, timer=1, amount=20, life_time=4, missile_size=5, particule_size=2,color=None, missile_color=(200, 215, 200), FPS=60):
-        super().__init__()
+    def __init__(self, x, y, timer=1, amount=20, life_time=4, missile_size=5, particule_size=2,color=None, missile_color=(200, 215, 200), FPS=60, raw=False):
+        super().__init__(raw=raw)
 
         self.pos = pygame.math.Vector2(x, y)
         self.timer = timer*FPS
@@ -54,8 +54,8 @@ class FireWork(particleSystem.ParticleSystem):
 
 
 class Dust(particleSystem.ParticleSystem):
-    def __init__(self, x, y, life_time=1, color=None, gravity=True, FPS=60):
-        super().__init__()
+    def __init__(self, x, y, life_time=1, color=None, gravity=True, FPS=60, raw=False):
+        super().__init__(raw=raw)
         self.pos = pygame.math.Vector2(x, y)
         self.life_time = int(life_time)*FPS
         self.count = 0
@@ -83,8 +83,8 @@ class Dust(particleSystem.ParticleSystem):
         
 
 class Explosion(particleSystem.ParticleSystem):
-    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60):
-        super().__init__()
+    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60, raw=False):
+        super().__init__(raw=raw)
         self.pos = pygame.math.Vector2(x, y)
         self.life_time = life_time*FPS
         self.count = 0
@@ -128,8 +128,8 @@ class Explosion(particleSystem.ParticleSystem):
 
 
 class FireExplosion(particleSystem.ParticleSystem):
-    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60):
-        super().__init__()
+    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60, raw=False):
+        super().__init__(raw=raw)
         self.pos = pygame.math.Vector2(x, y)
         self.life_time = life_time*FPS
         self.count = 0
@@ -179,8 +179,8 @@ class FireExplosion(particleSystem.ParticleSystem):
 
 
 class Smoke(particleSystem.ParticleSystem):
-    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60):
-        super().__init__()
+    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60, raw=False):
+        super().__init__(raw=raw)
         self.pos = pygame.math.Vector2(x, y)
         self.life_time = life_time*FPS
         self.count = 0
@@ -224,8 +224,8 @@ class Smoke(particleSystem.ParticleSystem):
 
 
 class LandExplosion(particleSystem.ParticleSystem):
-    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60):
-        super().__init__()
+    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60, raw=False):
+        super().__init__(raw=raw)
         self.pos = pygame.math.Vector2(x, y)
         self.life_time = life_time*FPS
         self.count = 0
@@ -269,8 +269,8 @@ class LandExplosion(particleSystem.ParticleSystem):
         
 
 class RewardExplosion(particleSystem.ParticleSystem):
-    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60):
-        super().__init__()
+    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60, raw=False):
+        super().__init__(raw=raw)
         self.pos = pygame.math.Vector2(x, y)
         self.life_time = life_time*FPS
         self.count = 0
@@ -306,5 +306,46 @@ class RewardExplosion(particleSystem.ParticleSystem):
         
         if self.amount_count <= 0:
             self.has_finish = True
+
+        super().draw(screen)
+        
+
+class Fire(particleSystem.ParticleSystem):
+    def __init__(self, x, y, life_time=1, amount=20, color=None, size=None, gravity=True, FPS=60, raw=False):
+        super().__init__(raw=raw)
+        self.pos = pygame.math.Vector2(x, y)
+        self.life_time = life_time*FPS
+        self.amount = amount
+        self.count = 0
+        self.color = color
+        self.size = size
+        self.gravity = gravity
+
+    def draw(self, screen):
+        self.count += 1
+       
+        if (self.size == None):
+            size = randint(5, 10)
+        else:
+            size = self.size + randint(-1,1)
+        if self.color == None:
+            ran = randint(0,3)
+            if ran > 1:
+                color = (randint(200, 255), randint(0, 15), randint(0, 15))
+            elif ran > 0:
+                color = (randint(200, 230),randint(80, 120),0)
+            else:
+                ore = randint(220, 240)
+                color = (randint(240, 255), ore, ore)
+        else:
+            color = self.color
+            
+        self.add(particleSystem.Particle(self.pos[0], self.pos[1], 
+                        randint(0,360), uniform(1,3), 
+                        size, size, color=color, 
+                        gravity=True, grav=(0,-0.1)))
+
+        if len(self.sprites()) > self.amount:
+            self.remove_first(screen)
 
         super().draw(screen)
