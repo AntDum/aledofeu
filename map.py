@@ -259,7 +259,6 @@ class Map:
         for sprite in self.tiles.sprites():
             sprite.draw(screen)
         self.player.draw(screen, dt)
-        print(self.particles)
         for particle in self.particles:
             particle.draw(screen)
         self.countdown_locater.print(screen)

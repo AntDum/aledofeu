@@ -143,14 +143,14 @@ class FireExplosion(particleSystem.ParticleSystem):
             else:
                 size = self.size
             if self.color == None:
-                color = (randint(0, 255), randint(0, 255), randint(0, 255))
+                color = (randint(200, 255), randint(0, 15), randint(0, 15))
             else:
                 color = self.color
                 
             self.add(particleSystem.Particle(self.pos[0], self.pos[1], 
-                            randint(0, 360), uniform(3,6), 
+                            randint(100, 200), uniform(1,3), 
                             size, size, color=color, 
-                            gravity=False))
+                            gravity=True, grav=(0,-0.1)))
         return self
 
     def draw(self, screen):

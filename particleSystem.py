@@ -2,7 +2,7 @@ import pygame
 
 
 class Particle(pygame.sprite.Sprite):
-    def __init__(self, x, y, angle, length, width=0, height=0, color=(255,255,255), image=None, gravity=True):
+    def __init__(self, x, y, angle, length, width=0, height=0, color=(255,255,255), image=None, gravity=True, grav=(0,0.1)):
         """Init
 
         Args:\n
@@ -35,7 +35,7 @@ class Particle(pygame.sprite.Sprite):
         self.acceleration = pygame.math.Vector2(0,0)
 
         if gravity:
-            self.gravity = pygame.math.Vector2(0, 0.1)
+            self.gravity = pygame.math.Vector2(grav[0], grav[1])
         else:
             self.gravity = pygame.math.Vector2(0, 0)
 
