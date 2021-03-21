@@ -47,16 +47,16 @@ class TextBox:
         self.text = str(text)
         return self
 
-    def change_font_from_file(self,font = False,fontSize = False,color = (255,255,255)):
+    def change_font_from_file(self,font = False,font_size = False,color = (255,255,255)):
         """
         FR: Modifie la police de la boite depuis un fichier ressource.
         EN: Change the box's font from a ressource file.
         """
-        if fontSize == False:
-            fontSize = self.fontSize
+        if font_size == False:
+            font_size = self.fontSize
         if font == False:
             font = self.fontName
-        self.font = pygame.font.Font(os.path.join("Ressources",f"{font}.ttf"),fontSize)
+        self.font = pygame.font.Font(os.path.join("res",f"{font}.otf"),font_size)
         self.color = color
         self.render()
         return self

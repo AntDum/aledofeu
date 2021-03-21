@@ -4,25 +4,27 @@ from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Fu
 import random as R
 import locate
 import particleEffect
+import os
 
-"""List des tokens
+pg.mixer.init()
 
-    0 = Vide
-    1 = Sol
-    10 = mur
-    11 = mur destructible
-    2 = Sol destructible
-    3 = Recuprerable de categorie n
-    4 = Conteneur
-    5 = seau
-    6 = echelle
-    7 = coeur du feu
-    8 = spawn player
-    9 = point de placage pour secure les items
-"""
+def get_effect(name, volume):
+    sound = pg.mixer.Sound(os.path.join("res","audio",f'{name}.wav'))
+    sound.set_volume(volume)
+    return sound
+
+sound_fire_extinguish = get_effect("drop_water", 0.5)
+sound_throw = get_effect("throw", 0.5)
+sound_destruction = get_effect("destruction", 0.5)
+sound_explosion = get_effect("destruction", 0.5)
+sound_jump = get_effect("jump", 0.3)
+sound_land = get_effect("land", 0.1)
+
+
 
 tokens = {
-    "60" : "empty",
+    "60" : "inner_empty",
+    "70" : "outer_empty",
     "0": "wall",
     "10": "ground destructible",
     "20": "wall",
@@ -52,9 +54,10 @@ def map_from_file(filename, tile_size=32):
 
         for x, token in enumerate(etage):
             token = tokens[token]
-            if token == "empty": # Vide
+            if token == "outer_empty": # Vide extérieur
+                pass
+            elif token == "inner_empty":
                 new_destroyable_pack = True
-
             elif token == "ground":#Sol
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
@@ -296,5 +299,24 @@ class Map:
         self.particles.append(particleEffect.Smoke(x,y, size=self.tile_size//3).explode())
 
     def add_particle_firework(self, x, y):
+<<<<<<< HEAD
         self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1,
                         missile_size=self.tile_size//4, particule_size=self.tile_size//16))
+=======
+        self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1, 
+                        missile_size=self.tile_size//4, particule_size=self.tile_size//16))
+        
+    def play_effect(self, effect):
+        if effect == "jump":
+            sound_jump.play()
+        elif effect == "throw":
+            sound_throw.play()
+        elif effect == "destruction":
+            sound_destruction.play()
+        elif effect == "fire_extinguish":
+            sound_fire_extinguish.play()
+        elif effect == "explosion":
+            sound_explosion.play()
+        elif effect == "land":
+            sound_land.play()
+>>>>>>> da021d81a7f3c883ef243e0e46a063f0fbdba6d4
