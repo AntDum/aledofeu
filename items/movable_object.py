@@ -57,14 +57,13 @@ class MovableObject(pg.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         self.prev_rect = self.rect
-        self.liftable = False
-
         self.pos = pg.Vector2(x*tile_size, y*tile_size)
 
         self.is_hard = is_hard
         self.is_fire = is_fire
         self.is_container = is_container
         self.is_liftable = is_liftable
+        self.is_ladder=False
         self.is_dirty = False
 
         # self.speedfact_x = 50
@@ -109,6 +108,9 @@ class MovableObject(pg.sprite.Sprite):
     def set_pos(self, x, y):
         self.pos.x = x * self.tile_size
         self.pos.y = y * self.tile_size
+    
+    def use(self):
+        pass
 
 
 class Liftable(MovableObject):
@@ -255,15 +257,18 @@ class FireCore(MovableObject):
         
 
 class Ladder(Liftable):
-    def __init__(self, x=0, y=0, tile_size=32, map=None):
+    def __init__(self, x=0, y=0, tile_size=32, map=None, item=True):
         super().__init__(x, y, image=ladder_sprite, tile_size=tile_size, map=map)
+        if item == False:
+            self.is_liftable=False
+            self.is_ladder=True
 
     def use(self):
         self.map.add_ladder(self.pos.x, self.pos.y)
+        self.kill()
         self.liftable = False
         # self.map.play_effect("reward")
         # self.map.add_particle_reward(self.rect.centerx, self.rect.centery)
-        self.kill()
 
     def update_middle(self,dt = 1):
         super().update_middle(dt=dt)

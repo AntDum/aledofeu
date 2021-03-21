@@ -6,7 +6,10 @@ import locate
 import particleEffect
 import os
 
-pg.mixer.init()
+import platform
+
+if platform.system() == "Windows":
+    pg.mixer.init()
 
 def get_image(name, scale):
     return pg.transform.scale(pg.image.load(os.path.join("res",f"{name}.png")), scale)
@@ -33,6 +36,7 @@ sound_tick = get_effect("tick", 0.1)
 music_background = get_music("sound", 0.1)
 
 score_background = get_image("score_ui", (200,40))
+fire_background = get_image("fire_background", (300,300))
 
 
 tokens = {
@@ -146,7 +150,7 @@ def map_from_file(filename, tile_size=32):
 
             elif token == "echelle": # échelles
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
-                map.add_tile(Ladder(x,y,tile_size=tile_size,map=map))
+                map.add_tile(Ladder(x,y,tile_size=tile_size,map=map, item=True))
                 new_destroyable_pack = True
 
             elif token == "fireplace": # incendie
@@ -199,6 +203,7 @@ class Map:
         self.fire_tiles = pg.sprite.Group()
         self.liftable_tiles = pg.sprite.Group()
         self.containers_tiles = pg.sprite.Group()
+        self.ladder_tiles = pg.sprite.Group()
         self.tiles_collider = pg.sprite.Group()
         self.destroyable_packages = []
         self.width_tile = 0
@@ -262,6 +267,8 @@ class Map:
             self.containers_tiles.add(tile)
         if(tile.is_liftable):
             self.liftable_tiles.add(tile)
+        if(tile.is_ladder):
+            self.ladder_tiles.add(tile)
 
 
     def collide_block_with_tile(self, entity, dir):
@@ -328,12 +335,17 @@ class Map:
         for particle in self.particles:
             particle.draw(screen)
         screen.blit(score_background,(0,0))
+        screen.blit(fire_background,())
         self.countdown_locater.print(screen)
         self.score_locater.print(screen)
     
     def add_ladder(self, x, y):
-        pass
-
+        x /= self.tile_size
+        y /= self.tile_size
+        for i in range(4):
+            self.add_tile(Ladder(x, y-i, tile_size=self.tile_size,map=self, item=False))
+        
+        
     def add_particle_firework(self, x, y):
         self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1,
                         missile_size=self.tile_size//4, particule_size=self.tile_size//16))

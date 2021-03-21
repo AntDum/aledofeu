@@ -26,14 +26,20 @@ class Player(movable_object.MovableObject):
         self.land = 0
 
     def update(self, dt):
-        self.vel.y += self.gravity * 50
+        ladder = self.map.collide_with_tile(self, self.map.ladder_tiles)
+        on_ladder = ladder[0] != None
+        if on_ladder:
+            self.vel.y = 0
+            self.touch_ground = True
+        else:
+            self.vel.y += self.gravity * 50
         fact_x = 35
         fact_y = 50
         if self.inventory:
             fact_x = self.inventory.speedfact_x
             fact_y = self.inventory.speedfact_y
 
-        self.get_keys(fact_x, fact_y)
+        self.get_keys(fact_x, fact_y, on_ladder)
         self.pos.x += self.vel.x * dt
         self.pos.y += self.vel.y * dt
         self.rect.x = self.pos.x
@@ -107,10 +113,11 @@ class Player(movable_object.MovableObject):
             else:
                 self.inventory.vel.y = -3
             self.map.add_tile(self.inventory)
+            self.inventory.use()
             self.inventory = None
 
 
-    def get_keys(self, fact_x, fact_y):
+    def get_keys(self, fact_x, fact_y, on_ladder):
         """
         Gather key board input and applies it.
         """
@@ -124,7 +131,9 @@ class Player(movable_object.MovableObject):
                     self.interact()
         self.vel.x = (keys[pg.K_RIGHT] - keys[pg.K_LEFT]) * self.speed * fact_x
         # self.vel.y = (keys[pg.K_DOWN] - keys[pg.K_UP]) * self.speed
-        if self.touch_ground:
+        if on_ladder:
+            self.vel.y = (keys[pg.K_DOWN] - keys[pg.K_UP]) * self.speed * fact_x
+        elif self.touch_ground:
             self.vel.y -= keys[pg.K_UP] * self.jump_force * fact_y
             if keys[pg.K_UP]:
                 self.map.play_effect("jump")
