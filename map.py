@@ -22,19 +22,19 @@ import particleEffect
 """
 
 tokens = {
-    "0" : "empty",
-    "1" : "ground",
-    "10": "wall",
-    "12": "wall",
-    "11": "wall destructible",
-    "2" : "ground destructible",
-    "3" : "items",
-    "4" : "container",
-    "5" : "seau",
-    "6" : "echelle",
-    "7" : "fireplace",
-    "8" : "spawn player",
-    "9" : "safer"
+    "60" : "empty",
+    "0": "wall",
+    "10": "ground destructible",
+    "20": "wall",
+    "30": "ground",
+    "40": "wall destructible",
+    "1" : "tab1", "11" : "tab2", "21" : "tab3",
+    "31": "chaise","41" : "table", "51" : "etagere", 
+    "2" : "seau",
+    "3" : "lit", "13" : "coffre" , "23" : "four" , "33" : "frigo",
+    "4" : "fireplace",
+    "5" : "spawn player",
+    "15" : "safer"
 }
 
 
@@ -75,12 +75,33 @@ def map_from_file(filename, tile_size=32):
                 map.destroyable_packages[-1].add(new_tile)
                 map.add_tile(new_tile)
 
-            elif token == "items": # Furnitures
-                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map))
+            elif token == "tab1": # Tableau tier 1
+                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 10))
+                new_destroyable_pack = True
+            elif token == "tab2": # Tableau tier 2
+                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 11))
+                new_destroyable_pack = True
+            elif token == "tab3": # Tableau tier 3
+                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 12))
+                new_destroyable_pack = True
+            elif token == "chaise": # Tableau tier 3
+                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 20))
+                new_destroyable_pack = True
+            elif token == "table": # Tableau tier 3
+                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 21))
                 new_destroyable_pack = True
 
-            elif token == "container": # Contenur
-                map.add_tile(Container(x,y,tile_size=tile_size,map=map))
+            elif token == "lit": # Contenur
+                map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=10))
+                new_destroyable_pack = True
+            elif token == "coffre": # Contenur
+                map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=11))
+                new_destroyable_pack = True
+            elif token == "four": # Contenur
+                map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=12))
+                new_destroyable_pack = True
+            elif token == "frigo": # Contenur
+                map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=13))
                 new_destroyable_pack = True
 
             elif token == "seau": # Seaux
@@ -115,13 +136,13 @@ def gen_level(filename):
             map_token.append(line.strip().split(','))
 
     for j,line in enumerate(map_token):
-        if('12' in line):
-            left_wall = line.index('12')
-            right_wall = line.index('12',left_wall+1)
+        if('20' in line):
+            left_wall = line.index('20')
+            right_wall = line.index('20',left_wall+1)
             stair_pos = R.randint(left_wall+1,right_wall-5)
-            line[stair_pos:stair_pos+4] = ['0','0','0','0']
-            map_token[j-1][stair_pos:stair_pos+4] = ['0','0','0','0']
-            map_token[j+3][stair_pos+1:stair_pos+3] = ['1','1']
+            line[stair_pos:stair_pos+4] = ['60','60','60','60']
+            map_token[j-1][stair_pos:stair_pos+4] = ['60','60','60','60']
+            map_token[j+3][stair_pos+1:stair_pos+3] = ['0','0']
     return map_token
 
 class Map:
@@ -266,5 +287,12 @@ class Map:
         self.countdown_locater.print(screen)
         self.score_locater.print(screen)
     
-    def add_particle_fire(self, pos):
-        self.particles.append(particleEffect.FireExplosion(pos.x, pos.y).explode())
+    def add_particle_fire(self, x, y):
+        self.particles.append(particleEffect.FireExplosion(x, y, size=self.tile_size//16).explode())
+
+    def add_particle_smoke(self, x, y):
+        self.particles.append(particleEffect.Smoke(x,y, size=self.tile_size//3).explode())
+        
+    def add_particle_firework(self, x, y):
+        self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1, 
+                        missile_size=self.tile_size//4, particule_size=self.tile_size//16))

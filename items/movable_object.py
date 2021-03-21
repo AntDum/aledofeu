@@ -12,8 +12,10 @@ def get_image_fire(name, scale):
 
 wall_sprite = get_image("Wall", (TILES_SIZE,TILES_SIZE))
 woodBackGround_sprite = get_image("Wood_backGround", (TILES_SIZE,TILES_SIZE))
-bed_sprite = get_image("bed_picture", (TILES_SIZE,TILES_SIZE))
 chairLeft_sprite = get_image("chair_left", (TILES_SIZE,TILES_SIZE))
+chairRight_sprite = get_image("chair_right", (TILES_SIZE,TILES_SIZE))
+table_sprite = get_image("table", (TILES_SIZE,TILES_SIZE))
+bed_sprite = get_image("bed_picture", (TILES_SIZE,TILES_SIZE))
 cooker_sprite = get_image("cooker", (TILES_SIZE,TILES_SIZE))
 fridge_sprite = get_image("fridge", (TILES_SIZE,TILES_SIZE))
 grass_sprite = get_image("grassMid", (TILES_SIZE,TILES_SIZE))
@@ -21,8 +23,7 @@ ladder_sprite = get_image("ladder_mid", (TILES_SIZE,TILES_SIZE))
 ladderTop_sprite = get_image("ladder_top", (TILES_SIZE,TILES_SIZE))
 poele_sprite = get_image("poele", (TILES_SIZE,TILES_SIZE))
 redWall = get_image("redWall", (TILES_SIZE,TILES_SIZE))
-table_sprite = get_image("table", (TILES_SIZE,TILES_SIZE))
-swordFish_oicture_sprite = get_image("swordfish_picture", (TILES_SIZE,TILES_SIZE))
+swordFish_picture_sprite = get_image("swordfish_picture", (TILES_SIZE,TILES_SIZE))
 grassPicture_sprite = get_image("grass_picture", (TILES_SIZE,TILES_SIZE))
 
 fires_sprite = [get_image_fire(f"fire{i}", ((TILES_SIZE), (TILES_SIZE))) for i in range(1,7)]
@@ -122,6 +123,7 @@ class WaterBucket(Liftable):
         self.map.freeze(5)
         fire_core.kill()
         self.kill()
+        self.map.add_particle_smoke(fire_core.rect.centerx, fire_core.rect.centery)
 
     def update_middle(self, dt=1):
         super().update_middle(dt=dt)
@@ -131,10 +133,30 @@ class WaterBucket(Liftable):
             
 
 class Furniture(Liftable):
-    def __init__(self, x=0, y=0, tile_size=32, map=None, value = 0):
-        super().__init__(x, y, image=chairLeft_sprite, tile_size=tile_size, map=map)
+    def __init__(self, x=0, y=0, tile_size=32, map=None, kind = 1):
         self.is_saved = False
-        self.value = value
+        if kind == 10: # Tableau tier 1
+            self.value = 5
+            sprite = grassPicture_sprite
+        elif kind == 11: # Tableau tier 2
+            self.value = 10
+            sprite = swordFish_picture_sprite
+        elif kind == 12: # Tableau tier 3
+            self.value = 40
+            sprite = grassPicture_sprite
+        elif kind == 20: # Chaise gauche
+            self.value = 5
+            sprite = chairLeft_sprite
+        elif kind == 21: # Chaise droite
+            self.value = 5
+            sprite = chairRight_sprite
+        elif kind == 22: # Table
+            self.value = 20
+            sprite = table_sprite
+        else:
+            sprite = None
+            self.value = 0    
+        super().__init__(x, y, image=sprite, tile_size=tile_size, map=map)
 
     def get_saved(self):
         self.map.score += self.value
@@ -147,7 +169,7 @@ class Furniture(Liftable):
         fire_collided = self.map.collide_with_tile(self,self.map.fire_tiles)
         if(fire_collided[0]!=None):
             self.kill()
-            self.map.add_particle_fire(self.pos)
+            self.map.add_particle_fire(self.rect.centerx, self.rect.centery)
             
         if(self.pos.x > self.map.safe_zone and not self.is_saved):
             self.get_saved()
@@ -157,11 +179,29 @@ class Container(MovableObject):
     """
     Class for all furnitures that can be looted by the player
     """
-    def __init__(self, x=0, y=0, tile_size=32, map=None):
-        super().__init__(x, y, image=cooker_sprite,tile_size=tile_size, is_hard=False, map=map, is_container=True)
+    def __init__(self, x=0, y=0, tile_size=32, map=None, kind=0):
+        if kind == 10: # Tableau tier 1
+            self.value = 5
+            sprite = bed_sprite
+        elif kind == 11: # Tableau tier 2
+            self.value = 10
+            sprite = bed_sprite
+        elif kind == 12: # Tableau tier 3
+            self.value = 40
+            sprite = cooker_sprite
+        elif kind == 13: # Chaise gauche
+            self.value = 5
+            sprite = fridge_sprite
+        else:
+            self.value = 0
+            sprite = None
+        super().__init__(x, y, image=sprite,tile_size=tile_size, is_hard=False, map=map, is_container=True)
 
     def open(self):
-        self.map.score += R.randint(0,30)
+        if R.random() < 0.3:
+            pass
+        self.map.score += R.randint(1,10)
+        self.map.add_particle_firework(self.rect.centerx, self.rect.bottom)
         self.kill()
 
 class FixObject(MovableObject):

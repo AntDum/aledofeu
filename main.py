@@ -25,7 +25,7 @@ def main():
 
     pg.display.flip()
 
-    map = map_from_file(os.path.join("niveaux", "lvl3.csv"), tile_size=TILES_SIZE)
+    map = map_from_file(os.path.join("niveaux", "lvl4.csv"), tile_size=TILES_SIZE)
 
     screen.set_size_tile(map.width_tile, map.height_tile)
 

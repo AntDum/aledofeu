@@ -46,7 +46,7 @@ class Particle(pygame.sprite.Sprite):
         self.speed += self.acceleration
         self.speed += self.gravity
 
-        self.pos += self.speed * dt * 50
+        self.pos += self.speed * dt * 10
 
         self.rect.x = int(self.pos.x)
         self.rect.y = int(self.pos.y)

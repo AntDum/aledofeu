@@ -15,7 +15,7 @@ player_sprite_idle = get_image("idle", ((TILES_SIZE*14)//17, (TILES_SIZE*17)//17
 
 
 class Player(movable_object.MovableObject):
-    def __init__(self, x=0, y=0, speed=10, jump_force=15, gravity=0.75, tile_size=32, map=None):
+    def __init__(self, x=0, y=0, speed=10, jump_force=15, gravity=0.7, tile_size=32, map=None):
         super().__init__(x,y,image=player_sprite_idle,tile_size=tile_size, gravity=0.75, has_gravity=True, map=map)
         self.speed = speed
         self.inventory = None
