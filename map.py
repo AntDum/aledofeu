@@ -15,14 +15,13 @@ je_crash = False
 # C'est moche mais dans le fond c'est pas grave
 # =================================================
 
-print(platform.system())
 if platform.system() == "Windows":
     pg.mixer.init()
 else:
     if not je_crash:
         pg.mixer.init()
     else:
-        class empty: 
+        class empty:
             def play(*args):
                 pass
             def set_volume(*args):
@@ -31,7 +30,7 @@ else:
                 pass
         pg.mixer.Sound = lambda *args: empty()
         pg.mixer.music = empty()
-        
+
 
 def get_image(name, scale):
     return pg.transform.scale(pg.image.load(os.path.join("res",f"{name}.png")), scale)
@@ -401,7 +400,7 @@ class Map:
         part = particleEffect.RewardExplosion(x, y, size=self.tile_size//16, raw=raw).explode()
         self.particles.append(part)
         return part
-    
+
     def add_particle_burn(self, x, y, raw=False):
         part = particleEffect.Fire(x, y, amount=25, size=self.tile_size//6, raw=raw)
         self.particles.append(part)

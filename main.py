@@ -16,7 +16,7 @@ def main():
     screen = Screen(WIDTH, HEIGHT, TILES_SIZE)
     clock = pg.time.Clock()
 
-    pg.display.set_caption("Aledofeu")
+    pg.display.set_caption("Adledofeu")
     background = pg.Surface([WIDTH, HEIGHT])
     background.fill((135,206,235))
 
@@ -46,7 +46,6 @@ def main():
 
         #update
         map.update(screen, dt)
-        
 
         #draw
         # pg.display.update(map.draw(screen))
@@ -62,6 +61,7 @@ def main():
         #Création de l'écran de fin de partie
 
     pg.quit() #quit le module pygame
-
+    
+    print(f"Ton score était {map.score}")
 
 main()
