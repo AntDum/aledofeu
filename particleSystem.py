@@ -54,19 +54,26 @@ class Particle(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit_cam(self.image, self.rect)
 
-
+    def draw_raw(self, screen):
+        screen.blit(self.image, self.rect)
+        
     def get_pos(self):
         return (self.pos.x, self.pos.y)
 
 
 class ParticleSystem(pygame.sprite.Group):
-    def __init__(self):
+    def __init__(self, raw=False):
         super().__init__()
         self.has_finish = False
+        self.raw = raw
 
     def draw(self, screen):
-        for sprite in self.sprites():
-            sprite.draw(screen)
+        if self.raw:
+            for sprite in self.sprites():
+                sprite.draw_raw(screen)
+        else:
+            for sprite in self.sprites():
+                sprite.draw(screen)
 
     def remove_first(self, screen):
         if (len(self.sprites()) > 0):

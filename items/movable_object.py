@@ -66,6 +66,7 @@ class MovableObject(pg.sprite.Sprite):
         self.is_ladder=False
         self.is_dirty = False
 
+        self.particle = None
         # self.speedfact_x = 50
         # self.speedfact_y = 50
 
@@ -74,6 +75,11 @@ class MovableObject(pg.sprite.Sprite):
         self.iteration = 0
 
         self.update_end()
+    
+    def kill(self):
+        if self.particle != None:
+            self.particle.has_finish = True
+        super().kill()
 
     def update(self, dt):
         self.update_middle(dt)
