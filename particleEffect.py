@@ -221,3 +221,48 @@ class Smoke(particleSystem.ParticleSystem):
             self.has_finish = True
 
         super().draw(screen)
+
+
+class LandExplosion(particleSystem.ParticleSystem):
+    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60):
+        super().__init__()
+        self.pos = pygame.math.Vector2(x, y)
+        self.life_time = life_time*FPS
+        self.count = 0
+        self.amount = amount
+        self.amount_count = amount
+        self.color = color
+        self.size = size
+
+    def explode(self):
+        self.amount_count += self.amount
+        self.has_finish = False
+        for _ in range(self.amount):
+            if (self.size == None):
+                size = randint(5, 10)
+            else:
+                size = self.size
+            if self.color == None:
+                ore = randint(50,120)
+                color = (ore, ore, ore)
+            else:
+                color = self.color
+                
+            self.add(particleSystem.Particle(self.pos[0], self.pos[1], 
+                            randint(-90, 90) -90, uniform(0.5,2), 
+                            size, size, color=color, 
+                            gravity=False))
+        return self
+
+    def draw(self, screen):
+        self.count += 1
+
+        if self.life_time <= self.count:
+            for _ in range(randint(self.amount//20,self.amount//5)):
+                self.remove_first(screen)
+                self.amount_count -= 1
+        
+        if self.amount_count <= 0:
+            self.has_finish = True
+
+        super().draw(screen)

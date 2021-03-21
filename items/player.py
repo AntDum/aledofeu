@@ -42,13 +42,13 @@ class Player(movable_object.MovableObject):
         if (self.map.collide_block_with_tile(self, 'y')) == "S":
             if self.touch_ground == False:
                 self.map.play_effect("land")
+                self.map.add_particle_land(self.rect.centerx, self.rect.bottom)
                 self.touch_ground = True
                 self.land = self.iteration % 2
         else:
             if self.iteration % 2 == self.land:
                 self.touch_ground = False
 
-        print(self.touch_ground)
         if(self.inventory):
             padding_y = -1 * self.tile_size
             self.inventory.pos.x = self.pos.x
@@ -60,6 +60,8 @@ class Player(movable_object.MovableObject):
 
     def draw(self, screen, dt):
         ite = self.iteration * dt * 10
+        if int(ite % 2) == 0 and self.vel.x != 0:
+            self.map.play_effect("walk")
         padding = self.tile_size*(4/17)
         if self.vel.x < 0:
             self.image = player_sprite_left[int(ite % 4)]

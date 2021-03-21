@@ -208,9 +208,9 @@ class Container(MovableObject):
 
     def open(self):
         if R.random() < 0.3:
-            pass
-        self.map.score += R.randint(1,10)
-        self.map.add_particle_firework(self.rect.centerx, self.rect.bottom)
+            self.map.play_effect("reward")
+            self.map.score += R.randint(1,10)
+            self.map.add_particle_firework(self.rect.centerx, self.rect.bottom)
         self.kill()
 
 class FixObject(MovableObject):
