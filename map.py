@@ -11,7 +11,8 @@ import platform
 print(platform.system())
 if platform.system() == "Windows":
     pg.mixer.init()
-
+else:
+    pg.mixer.init()
 
 def get_image(name, scale):
     return pg.transform.scale(pg.image.load(os.path.join("res",f"{name}.png")), scale)
