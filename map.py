@@ -1,6 +1,6 @@
 import pygame as pg
 from items.player import Player
-from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture,FixObject
+from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture,FixObject,FireCore
 import random as R
 import locate
 
@@ -91,7 +91,7 @@ def map_from_file(filename, tile_size=32):
                 new_destroyable_pack = True
 
             elif token == "fireplace": # incendie
-                map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map,is_fire=True, is_hard=False))
+                map.add_tile(FireCore(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
 
             elif token == "safer": # Point de depot

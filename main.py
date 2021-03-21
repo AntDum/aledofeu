@@ -53,7 +53,8 @@ def main():
         screen.blit(background, (0,0))
         map.draw(screen, dt)
         # screen.draw_grid()
-        run = map.countdown > 0
+        if map.countdown < 0:
+            run = False
 
         #update screen
         pg.display.flip()

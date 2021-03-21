@@ -30,8 +30,6 @@ waterBucket_sprite = get_image_fire("water_bucket", (TILES_SIZE,TILES_SIZE))
 
 
 
-
-
 class MovableObject(pg.sprite.Sprite):
 
     def __init__(self, x=0, y=0, image=None, tile_size=32, is_hard=True, is_liftable=False,
@@ -41,8 +39,7 @@ class MovableObject(pg.sprite.Sprite):
         self.tile_size = tile_size
         if image == None:
             self.image = pg.Surface((tile_size,tile_size))
-            if is_fire:
-                self.image.fill((0,255,0))
+            self.image.fill((0,255,0))
         else:
             self.image = image
 
@@ -88,8 +85,6 @@ class MovableObject(pg.sprite.Sprite):
             if (self.map.collide_block_with_tile(self, 'y')) == "S":
                 self.has_gravity = False
             self.map.collide_block_with_tile(self, 'x')
-
-
 
 
     def update_end(self, dt=1):
@@ -170,3 +165,13 @@ class FixObject(MovableObject):
             image = wall_sprite
         super().__init__(x,y, image=image, tile_size=tile_size, map=None)
 
+
+class FireCore(MovableObject):
+    def __init__(self, x=0, y=0, tile_size=32, map=None):
+        super().__init__(x,y, image=fires_sprite[0], tile_size=tile_size, map=None, is_hard=False)
+    
+    def update(self, dt):
+        self.update_middle()
+        ite = self.iteration * dt * 10
+        self.image = fires_sprite[int(ite % 6)]
+        self.update_end()
