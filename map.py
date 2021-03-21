@@ -1,11 +1,11 @@
 import pygame as pg
 from items.player import Player
-from items.movable_object import MovableObject,Container,Liftable
+from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture,FixObject,FireCore
 import random as R
 import locate
 
 """List des tokens
-    
+
     0 = Vide
     1 = Sol
     10 = mur
@@ -20,6 +20,23 @@ import locate
     9 = point de placage pour secure les items
 """
 
+tokens = {
+    "0" : "empty",
+    "1" : "ground",
+    "10": "wall",
+    "12": "wall",
+    "11": "wall destructible",
+    "2" : "ground destructible",
+    "3" : "items",
+    "4" : "container",
+    "5" : "seau",
+    "6" : "echelle",
+    "7" : "fireplace",
+    "8" : "spawn player",
+    "9" : "safer"
+}
+
+
 def map_from_file(filename, tile_size=32):
     """
     From a csv file, returns a map.
@@ -27,57 +44,79 @@ def map_from_file(filename, tile_size=32):
     map_token = gen_level(filename)
     map = Map()
     map.height_tile = len(map_token)
+    new_destroyable_pack = True #Boolean used to detect packs of burning floor.
     map.width_tile = len(map_token[0])
     for y, etage in enumerate(map_token):
         map.width_tile = max(map.width_tile, len(etage))
-        
-        for x, token in enumerate(etage):         
-            if token.startswith("0"): # Vide
-                pass
-            elif token.startswith("1"):
-                if token == "1":
-                    map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map))
-                elif token == "10" or token =='12':
-                    map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map, image=pg.Surface((tile_size, tile_size))))
-                elif token == "11":
-                    map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map))
-            elif token.startswith("2"): # Sol
-                map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map))        
-            elif token.startswith("3"): # Sol destructible
-                map.add_tile(Liftable(x,y,tile_size=tile_size,map=map))
-            elif token.startswith("4"): # Contenur
+
+        for x, token in enumerate(etage):
+            token = tokens[token]
+            if token == "empty": # Vide
+                new_destroyable_pack = True
+
+            elif token == "ground":#Sol
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+
+            elif token == "wall":#Murs
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+
+            elif token == "wall destructible":#Murs cassables
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+
+            elif token == "ground destructible": # Sol destructibles
+                new_tile = FixObject(x,y,tile_size=tile_size,map=map)
+                if(new_destroyable_pack):
+                    map.destroyable_packages.append(pg.sprite.Group())
+                    new_destroyable_pack = False
+                map.destroyable_packages[-1].add(new_tile)
+                map.add_tile(new_tile)
+
+            elif token == "items": # Furnitures
+                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+
+            elif token == "container": # Contenur
                 map.add_tile(Container(x,y,tile_size=tile_size,map=map))
-            elif token.startswith("5"): # Seaux
+                new_destroyable_pack = True
+
+            elif token == "seau": # Seaux
+                map.add_tile(WaterBucket(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+
+            elif token == "echelle": # échelles
                 map.add_tile(Liftable(x,y,tile_size=tile_size,map=map))
-            elif token.startswith("6"): # échelles
-                map.add_tile(Liftable(x,y,tile_size=tile_size,map=map))
-            elif token.startswith("7"): # incendie
-                map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map))
-            elif token.startswith("8"): # Spawn player
+                new_destroyable_pack = True
+
+            elif token == "fireplace": # incendie
+                map.add_tile(FireCore(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+
+            elif token == "safer": # Point de depot
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+                map.safe_zone = x*tile_size
+
+            elif token == "spawn player": # Spawn player
                 map.player.set_pos(x,y)
-            elif token.startswith("9"): # Point de depot
-                map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map))
+                new_destroyable_pack = True
+
     return map
 
 def gen_level(filename):
+    """Randomly places stairs in the level, each stair will be placed between two floor delimiters.
+    """
     map_token = []
     with open(filename) as f:
         for line in f:
             map_token.append(line.strip().split(','))
 
-    for j in range(len(map_token)):
-        line = map_token[j]
+    for j,line in enumerate(map_token):
         if('12' in line):
-            left_wall = 0
-            right_wall = 0
-            i = 0
-            while(line[i] != '12'):
-                i+=1
-            left_wall = i
-            i+=1
-            while(line[i] != '12'):
-                i+=1
-            right_wall = i
+            left_wall = line.index('12')
+            right_wall = line.index('12',left_wall+1)
             stair_pos = R.randint(left_wall+1,right_wall-5)
             line[stair_pos:stair_pos+4] = ['0','0','0','0']
             map_token[j-1][stair_pos:stair_pos+4] = ['0','0','0','0']
@@ -88,48 +127,71 @@ class Map:
     def __init__(self, tile_size=32):
         self.countdown = 60
         self.countdown_locater = locate.TextBox(font_size = 150)
-        self.frozen_timer = False
+        self.score = 0
+        self.score_locater = locate.TextBox(x_pos=0,y_pos=0)
+        self.safe_zone = 0
+        self.freeze_cooldown = 0
         self.tile_size = tile_size
         self.tiles = pg.sprite.Group()
-        self.soft_tiles = pg.sprite.Group()
+        self.particles = []
+        self.fire_tiles = pg.sprite.Group()
+        self.liftable_tiles = pg.sprite.Group()
+        self.containers_tiles = pg.sprite.Group()
         self.tiles_collider = pg.sprite.Group()
+        self.destroyable_packages = []
         self.width_tile = 0
         self.height_tile = 0
+        self.iteration = 0
+        self.last_shake = -100
         self.player = Player(tile_size = tile_size, map=self)
-        # for y in range(len(map_id)):
-        #     for x in range(len(map_id[y])):
-        #         if map_id[y][x] == '1':
-        #             tile = Tile(x,y)
-        #             self.tiles.add(tile)
-        #             self.tiles_collider.add(tile)
-        #         elif map_id[y][x] == 'MP':
-        #             self.player = Player(x,y)
 
-    def tile_pos(self,x,y):
-        """
-        Returns the tile containing the point (x,y)
-        """
-        for tile in self.tiles.sprites():
-            pass
+
+    def freeze(self,lap):
+        self.freeze_cooldown += lap
 
     def update(self, screen, dt):
-        self.countdown -= dt
+        #Gestion du compteur
+        if(self.freeze_cooldown > 0):
+            self.freeze_cooldown -= dt
+        else:
+            self.countdown -= dt
+            self.freeze_cooldown = 0
+        if(round(self.countdown % 5,1) == 0):
+            i = R.randint(0,len(self.destroyable_packages)-1)
+            for tile in self.destroyable_packages[i]:
+                tile.kill()
+            self.last_shake = self.iteration
+            
+        #Update des éléments
         self.tiles.update(dt)
         self.player.update(dt)
         screen.update_camera(self.player)
         self.countdown_locater.center(screen.surface).move(y=-250)
         self.countdown_locater.change_text(str(int(self.countdown)))
+        
+        if (self.last_shake - self.iteration) * dt > -10 * dt:
+            screen.shake()
+        
+        self.iteration += 1
+        
+        self.score_locater.change_text(f"Score : {self.score}")
+        self.score_locater.render()
+        self.countdown_locater.render()
 
-    
+
     def add_tile(self, tile):
         self.tiles.add(tile)
         if(tile.is_hard):
             self.tiles_collider.add(tile)
-        else:
-            self.soft_tiles.add(tile)
+        if(tile.is_fire):
+            self.fire_tiles.add(tile)
+        if(tile.is_container):
+            self.containers_tiles.add(tile)
+        if(tile.is_liftable):
+            self.liftable_tiles.add(tile)
 
 
-    def collide_with_tile(self, entity, dir):
+    def collide_block_with_tile(self, entity, dir):
         hit_dir = ""
         if dir == 'x':
             hits = pg.sprite.spritecollide(entity, self.tiles_collider, False)
@@ -155,9 +217,41 @@ class Map:
                 entity.rect.y = entity.pos.y
         return hit_dir
 
+
+    def collide_with_tile(self, entity, group):
+        """[summary]
+
+        Args:
+            entity : Qui est testé
+            group : Avec quel groupe
+
+        Returns:
+            tuple: (hit, dir) hit l'objet avec qui a eu une collision
+                                dir la direction dans la quel il y a une collision
+                        dir est une liste avec les directions
+            (None, []) si pas de collision
+        """
+        hit_dir = []
+        hits = pg.sprite.spritecollide(entity, group, False)
+        if hits:
+            hits = hits[0]
+            if entity.vel.x > 0:
+                hit_dir.append("E")
+            elif entity.vel.x < 0:
+                hit_dir.append("W")
+
+            if entity.vel.y > 0:
+                hit_dir.append("S")
+            elif entity.vel.y < 0:
+                hit_dir.append("N")
+        else:
+            hits = None
+        return (hits, hit_dir)
+
     def draw(self, screen, dt):
         for sprite in self.tiles.sprites():
             sprite.draw(screen)
         self.player.draw(screen, dt)
+        (particles.draw(screen) for particles in self.particles)
         self.countdown_locater.print(screen)
-
+        self.score_locater.print(screen)

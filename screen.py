@@ -1,4 +1,5 @@
 import pygame as pg
+import random as R
 
 class Screen:
     def __init__(self, w, h, tile_size=32):
@@ -49,3 +50,13 @@ class Screen:
 
         self.camera.x = x
         self.camera.y = y
+    
+    def shake(self):
+        if R.random() > 0.5:
+            self.camera.x += 5
+        else:
+            self.camera.x -= 5
+        if R.random() > 0.5:
+            self.camera.y += 5
+        else:
+            self.camera.y -= 5
