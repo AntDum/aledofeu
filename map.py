@@ -149,6 +149,10 @@ def map_from_file(filename, tile_size=32):
                 if(R.randint(0,4)>1):
                     map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 22))
                 new_destroyable_pack = True
+            elif token == "etagere": # Table
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 23))
+                new_destroyable_pack = True
 
             elif token == "lit": # Lit
                 map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
