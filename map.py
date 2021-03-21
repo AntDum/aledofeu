@@ -13,20 +13,13 @@ def get_effect(name, volume):
     sound.set_volume(volume)
     return sound
 
-def get_music(name, volume):
-    pg.mixer.music.load(os.path.join("res","audio",f'{name}.mp3'))
-    return pg.mixer.music
-
 sound_fire_extinguish = get_effect("drop_water", 0.5)
 sound_throw = get_effect("throw", 0.5)
 sound_destruction = get_effect("destruction", 0.5)
 sound_explosion = get_effect("destruction", 0.5)
-sound_jump = get_effect("jump", 0.2)
+sound_jump = get_effect("jump", 0.3)
 sound_land = get_effect("land", 0.1)
-sound_reward = get_effect("reward", 0.25)
-sound_tick = get_effect("tick", 0.05)
 
-music_background = get_music("sound", 0.5)
 
 
 tokens = {
@@ -178,7 +171,6 @@ class Map:
         self.iteration = 0
         self.last_shake = -100
         self.player = Player(tile_size = tile_size, map=self)
-        music_background.play()
 
 
     def freeze(self,lap):
@@ -189,8 +181,6 @@ class Map:
         if(self.freeze_cooldown > 0):
             self.freeze_cooldown -= dt
         else:
-            if self.iteration % 2 == 0:
-                self.play_effect("tick")
             self.countdown -= dt
             self.freeze_cooldown = 0
         if(round(self.countdown % 5,1) == 0):
@@ -311,10 +301,10 @@ class Map:
     def add_particle_firework(self, x, y):
         self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1,
                         missile_size=self.tile_size//4, particule_size=self.tile_size//16))
-        
+
     def add_particle_land(self, x, y):
-        self.particles.append(particleEffect.LandExplosion(x,y, life_time=0.5, size=self.tile_size//16).explode())
-        
+        self.particles.append(particleEffect.LandExplosion(x, y, size=self.tile_size//16).explode())
+
     def play_effect(self, effect):
         if effect == "jump":
             sound_jump.play()
@@ -328,9 +318,3 @@ class Map:
             sound_explosion.play()
         elif effect == "land":
             sound_land.play()
-        elif effect == "reward":
-            sound_reward.play()
-        elif effect == "walk":
-            pass
-        elif effect == "tick":
-            sound_tick.play()
