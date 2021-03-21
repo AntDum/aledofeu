@@ -5,8 +5,8 @@ from map import map_from_file
 from button import Button
 import os
 
-WIDTH = 800
-HEIGHT = 600
+WIDTH = 1200
+HEIGHT = 700
 FPS_MAX = 60
 TILES_SIZE = 32
 
@@ -67,7 +67,7 @@ def main():
 
     # Boucle de
     screen.blit(background, (0,0))
-    is_in_menu = False
+    is_in_menu = True
     new_game_wanted = False
     play_again = Button("Rejouer")
     play_again.move_to(200,200)
