@@ -147,6 +147,7 @@ class Furniture(Liftable):
         fire_collided = self.map.collide_with_tile(self,self.map.fire_tiles)
         if(fire_collided[0]!=None):
             self.kill()
+            self.map.add_particle_fire(self.pos)
             
         if(self.pos.x > self.map.safe_zone and not self.is_saved):
             self.get_saved()

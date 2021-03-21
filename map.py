@@ -3,6 +3,7 @@ from items.player import Player
 from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture,FixObject,FireCore
 import random as R
 import locate
+import particleEffect
 
 """List des tokens
 
@@ -168,6 +169,12 @@ class Map:
         screen.update_camera(self.player)
 
         self.countdown_locater.change_text(str(int(self.countdown)))
+        
+        for particle in self.particles:
+            particle.update(dt)
+            if particle.has_finish:
+                self.particles.remove(particle)
+        
 
         if (self.last_shake - self.iteration) * dt > -10 * dt:
             screen.shake()
@@ -254,6 +261,11 @@ class Map:
         for sprite in self.tiles.sprites():
             sprite.draw(screen)
         self.player.draw(screen, dt)
-        (particles.draw(screen) for particles in self.particles)
+        print(self.particles)
+        for particle in self.particles:
+            particle.draw(screen)
         self.countdown_locater.print(screen)
         self.score_locater.print(screen)
+    
+    def add_particle_fire(self, pos):
+        self.particles.append(particleEffect.FireExplosion(pos.x, pos.y).explode())
