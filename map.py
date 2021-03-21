@@ -38,7 +38,7 @@ tokens = {
     "30": "ground",
     "40": "wall destructible",
     "1" : "tab1", "11" : "tab2", "21" : "tab3",
-    "31": "chaise","41" : "table", "51" : "etagere", 
+    "31": "chaise","41" : "table", "51" : "etagere",
     "2" : "seau",
     "3" : "lit", "13" : "coffre" , "23" : "four" , "33" : "frigo",
     "4" : "fireplace",
@@ -159,8 +159,10 @@ class Map:
     def __init__(self, tile_size=32):
         self.countdown = 60
         self.countdown_locater = locate.TextBox(font_size = 150)
+        self.countdown_locater.change_font_from_file("terminal-grotesque_open")
         self.score = 0
         self.score_locater = locate.TextBox(x_pos=0,y_pos=0)
+        self.score_locater.change_font_from_file("terminal-grotesque_open",font_size = 40,color = (0,0,0))
         self.safe_zone = 0
         self.freeze_cooldown = 0
         self.tile_size = tile_size
@@ -203,12 +205,12 @@ class Map:
         screen.update_camera(self.player)
 
         self.countdown_locater.change_text(str(int(self.countdown)))
-        
+
         for particle in self.particles:
             particle.update(dt)
             if particle.has_finish:
                 self.particles.remove(particle)
-        
+
 
         if (self.last_shake - self.iteration) * dt > -10 * dt:
             screen.shake()
@@ -299,16 +301,17 @@ class Map:
             particle.draw(screen)
         self.countdown_locater.print(screen)
         self.score_locater.print(screen)
-    
+
     def add_particle_fire(self, x, y):
         self.particles.append(particleEffect.FireExplosion(x, y, size=self.tile_size//16).explode())
 
     def add_particle_smoke(self, x, y):
         self.particles.append(particleEffect.Smoke(x,y, size=self.tile_size//3).explode())
-        
+
     def add_particle_firework(self, x, y):
-        self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1, 
+        self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1,
                         missile_size=self.tile_size//4, particule_size=self.tile_size//16))
+        
     def add_particle_land(self, x, y):
         self.particles.append(particleEffect.LandExplosion(x,y, life_time=0.5, size=self.tile_size//16).explode())
         
