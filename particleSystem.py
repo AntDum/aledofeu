@@ -46,13 +46,12 @@ class Particle(pygame.sprite.Sprite):
         self.speed += self.acceleration
         self.speed += self.gravity
 
-        self.pos += self.speed * dt
+        self.pos += self.speed * dt * 50
 
         self.rect.x = int(self.pos.x)
         self.rect.y = int(self.pos.y)
     
     def draw(self, screen):
-        print(f"particule {self.pos}")
         screen.blit_cam(self.image, self.rect)
 
 
@@ -63,9 +62,9 @@ class Particle(pygame.sprite.Sprite):
 class ParticleSystem(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
+        self.has_finish = False
 
     def draw(self, screen):
-        print("draw")
         for sprite in self.sprites():
             sprite.draw(screen)
 

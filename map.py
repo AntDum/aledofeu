@@ -172,6 +172,8 @@ class Map:
         
         for particle in self.particles:
             particle.update(dt)
+            if particle.has_finish:
+                self.particles.remove(particle)
         
         if (self.last_shake - self.iteration) * dt > -10 * dt:
             screen.shake()
@@ -256,10 +258,11 @@ class Map:
         for sprite in self.tiles.sprites():
             sprite.draw(screen)
         self.player.draw(screen, dt)
+        print(self.particles)
         for particle in self.particles:
             particle.draw(screen)
         self.countdown_locater.print(screen)
         self.score_locater.print(screen)
     
     def add_particle_fire(self, pos):
-        self.particles.append(particleEffect.Explosion(pos.x, pos.y).explode())
+        self.particles.append(particleEffect.FireExplosion(pos.x, pos.y).explode())
