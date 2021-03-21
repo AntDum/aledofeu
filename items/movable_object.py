@@ -118,7 +118,7 @@ class WaterBucket(Liftable):
         super().__init__(x, y, image=waterBucket_sprite, tile_size=tile_size, map=map)
 
     def extinguish(self,fire_core):
-        print("Extinction du feu")
+        # print("Extinction du feu")
         self.map.freeze(5)
         fire_core.kill()
         self.kill()
@@ -128,6 +128,7 @@ class WaterBucket(Liftable):
         fire_collided = self.map.collide_with_tile(self,self.map.fire_tiles)
         if(fire_collided[0]!=None):
             self.extinguish(fire_collided[0])
+            
 
 class Furniture(Liftable):
     def __init__(self, x=0, y=0, tile_size=32, map=None, value = 0):
@@ -143,6 +144,10 @@ class Furniture(Liftable):
 
     def update_middle(self,dt = 1):
         super().update_middle(dt=dt)
+        fire_collided = self.map.collide_with_tile(self,self.map.fire_tiles)
+        if(fire_collided[0]!=None):
+            self.kill()
+            
         if(self.pos.x > self.map.safe_zone and not self.is_saved):
             self.get_saved()
 
@@ -168,7 +173,7 @@ class FixObject(MovableObject):
 
 class FireCore(MovableObject):
     def __init__(self, x=0, y=0, tile_size=32, map=None):
-        super().__init__(x,y, image=fires_sprite[0], tile_size=tile_size, map=None, is_hard=False)
+        super().__init__(x,y, image=fires_sprite[0], tile_size=tile_size, map=None, is_hard=False, is_fire=True)
     
     def update(self, dt):
         self.update_middle()

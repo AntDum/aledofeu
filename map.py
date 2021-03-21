@@ -133,6 +133,7 @@ class Map:
         self.freeze_cooldown = 0
         self.tile_size = tile_size
         self.tiles = pg.sprite.Group()
+        self.particles = []
         self.fire_tiles = pg.sprite.Group()
         self.liftable_tiles = pg.sprite.Group()
         self.containers_tiles = pg.sprite.Group()
@@ -182,11 +183,11 @@ class Map:
         self.tiles.add(tile)
         if(tile.is_hard):
             self.tiles_collider.add(tile)
-        elif(tile.is_fire):
+        if(tile.is_fire):
             self.fire_tiles.add(tile)
-        elif(tile.is_container):
+        if(tile.is_container):
             self.containers_tiles.add(tile)
-        else:
+        if(tile.is_liftable):
             self.liftable_tiles.add(tile)
 
 
@@ -251,5 +252,6 @@ class Map:
         for sprite in self.tiles.sprites():
             sprite.draw(screen)
         self.player.draw(screen, dt)
+        (particles.draw(screen) for particles in self.particles)
         self.countdown_locater.print(screen)
         self.score_locater.print(screen)
