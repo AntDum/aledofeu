@@ -8,11 +8,30 @@ import os
 
 import platform
 
+# =================================================
+# =================================================
+je_crash = False
+# =================================================
+# C'est moche mais dans le fond c'est pas grave
+# =================================================
+
 print(platform.system())
 if platform.system() == "Windows":
     pg.mixer.init()
 else:
-    pg.mixer.init()
+    if not je_crash:
+        pg.mixer.init()
+    else:
+        class empty: 
+            def play(*args):
+                pass
+            def set_volume(*args):
+                pass
+            def load(*args):
+                pass
+        pg.mixer.Sound = lambda *args: empty()
+        pg.mixer.music = empty()
+        
 
 def get_image(name, scale):
     return pg.transform.scale(pg.image.load(os.path.join("res",f"{name}.png")), scale)
