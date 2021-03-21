@@ -121,7 +121,7 @@ def gen_level(filename):
             stair_pos = R.randint(left_wall+1,right_wall-5)
             line[stair_pos:stair_pos+4] = ['0','0','0','0']
             map_token[j-1][stair_pos:stair_pos+4] = ['0','0','0','0']
-            map_token[j+3][stair_pos+1:stair_pos+3] = ['2','2']
+            map_token[j+3][stair_pos+1:stair_pos+3] = ['1','1']
     return map_token
 
 class Map:
@@ -162,7 +162,7 @@ class Map:
             for tile in self.destroyable_packages[i]:
                 tile.kill()
             self.last_shake = self.iteration
-            
+
         #Update des éléments
         self.tiles.update(dt)
         self.player.update(dt)
@@ -175,11 +175,12 @@ class Map:
             if particle.has_finish:
                 self.particles.remove(particle)
         
+
         if (self.last_shake - self.iteration) * dt > -10 * dt:
             screen.shake()
-        
+
         self.iteration += 1
-        
+
         self.score_locater.change_text(f"Score : {self.score}")
         self.score_locater.render()
         self.countdown_locater.render()
