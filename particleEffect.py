@@ -266,3 +266,45 @@ class LandExplosion(particleSystem.ParticleSystem):
             self.has_finish = True
 
         super().draw(screen)
+        
+
+class RewardExplosion(particleSystem.ParticleSystem):
+    def __init__(self, x, y, amount=20, life_time=1, color=None, size=None, FPS=60):
+        super().__init__()
+        self.pos = pygame.math.Vector2(x, y)
+        self.life_time = life_time*FPS
+        self.count = 0
+        self.amount = amount
+        self.amount_count = amount
+        self.color = color
+        self.size = size
+
+    def explode(self):
+        self.amount_count += self.amount
+        self.has_finish = False
+        for _ in range(self.amount):
+            size = randint(-2,2) + self.size
+            if self.color == None:
+                if randint(0,1) > 0:
+                    color = (randint(0, 15),randint(230, 255),randint(0, 15))
+                else:
+                    color = (randint(230, 255),randint(200, 230),randint(0, 15))
+            else:
+                color = self.color
+                
+            self.add(particleSystem.Particle(self.pos[0], self.pos[1], randint(0, 360),
+                    randint(1, 4), size, size, color=color, gravity=True))
+        return self
+
+    def draw(self, screen):
+        self.count += 1
+
+        if self.life_time <= self.count:
+            for _ in range(randint(self.amount//20,self.amount//5)):
+                self.remove_first(screen)
+                self.amount_count -= 1
+        
+        if self.amount_count <= 0:
+            self.has_finish = True
+
+        super().draw(screen)

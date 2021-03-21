@@ -60,8 +60,6 @@ class Player(movable_object.MovableObject):
 
     def draw(self, screen, dt):
         ite = self.iteration * dt * 10
-        if int(ite % 2) == 0 and self.vel.x != 0:
-            self.map.play_effect("walk")
         padding = self.tile_size*(4/17)
         if self.vel.x < 0:
             self.image = player_sprite_left[int(ite % 4)]
@@ -104,6 +102,10 @@ class Player(movable_object.MovableObject):
             self.map.play_effect("throw")
             self.inventory.has_gravity = True
             self.inventory.vel.x = self.vel.x * 2
+            if self.vel.y < 0:
+                self.inventory.vel.y = self.vel.y / 35
+            else:
+                self.inventory.vel.y = -3
             self.map.add_tile(self.inventory)
             self.inventory = None
 

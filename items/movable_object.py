@@ -25,7 +25,7 @@ grass_sprite = get_tile("grassMid")
 ladder_sprite = get_tile("ladder_mid")
 ladderTop_sprite = get_tile("ladder_top")
 poele_sprite = get_tile("poele")
-redWall = get_tile("redWall")
+red_wall_sprite = get_tile("redWall")
 #Picture
 swordFish_picture_sprite = get_tile("swordfish_picture")
 grassPicture_sprite = get_tile("grass_picture")
@@ -83,15 +83,17 @@ class MovableObject(pg.sprite.Sprite):
 
     def update_middle(self, dt=1):
         #Calcul la nouvelle position.
-        self.pos.x += self.vel.x * dt * 3.1
-        self.vel.x = round(self.vel.x * 0.85, 3)
+        self.pos.x += self.vel.x * dt * 2.5
         if abs(self.vel.x) < 0.1:
             self.vel.x = 0
         if (self.vel.x != 0 or self.has_gravity):
             self.vel.y += self.gravity
-            self.pos.y += self.vel.y * dt * 50
+            self.pos.y += self.vel.y * dt * 35
             if (self.map.collide_block_with_tile(self, 'y')) == "S":
                 self.has_gravity = False
+                self.vel.x = round(self.vel.x * 0.80, 3)
+            else:
+                self.vel.x = round(self.vel.x * 0.91, 3)
             self.map.collide_block_with_tile(self, 'x')
 
 
@@ -116,7 +118,7 @@ class Liftable(MovableObject):
     def __init__(self, x=0, y=0, image=None, tile_size=32, map=None):
         super().__init__(x, y, image=image,tile_size=tile_size, is_hard=False, is_liftable=True, map=map)
         self.speedfact_x = 25
-        self.speedfact_y = 45
+        self.speedfact_y = 50
 
 class WaterBucket(Liftable):
     """
@@ -127,7 +129,7 @@ class WaterBucket(Liftable):
 
     def extinguish(self,fire_core):
         # print("Extinction du feu")
-        self.map.freeze(5)
+        self.map.freeze(10)
         fire_core.kill()
         self.kill()
         self.map.add_particle_smoke(fire_core.rect.centerx, fire_core.rect.centery)
@@ -145,10 +147,17 @@ class Furniture(Liftable):
         self.is_saved = False
         if kind == 10: # Tableau tier 1
             self.value = 5
-            sprite = mountainPicture_sprite
+            if R.random() > 0.5:
+                sprite = swordFish_picture_sprite
+            else:
+                sprite = grassPicture_sprite
+                
         elif kind == 11: # Tableau tier 2
             self.value = 10
-            sprite = flowerPicture_sprite
+            if R.random() > 0.5:
+                sprite = mountainPicture_sprite
+            else:
+                sprite = flowerPicture_sprite
         elif kind == 12: # Tableau tier 3
             self.value = 40
             sprite = shipPicture_sprite
@@ -168,9 +177,11 @@ class Furniture(Liftable):
 
     def get_saved(self):
         self.map.score += self.value
-        print(self.map.score)
         self.is_saved = True
         self.liftable = False
+        self.map.play_effect("reward")
+        self.map.add_particle_reward(self.rect.centerx, self.rect.centery)
+        self.kill()
 
     def update_middle(self,dt = 1):
         super().update_middle(dt=dt)
@@ -189,16 +200,16 @@ class Container(MovableObject):
     Class for all furnitures that can be looted by the player
     """
     def __init__(self, x=0, y=0, tile_size=32, map=None, kind=0):
-        if kind == 10: # Tableau tier 1
+        if kind == 10: # lit
             self.value = 5
             sprite = bed_sprite
-        elif kind == 11: # Tableau tier 2
+        elif kind == 11: # lit
             self.value = 10
             sprite = bed_sprite
-        elif kind == 12: # Tableau tier 3
+        elif kind == 12: # cooker
             self.value = 40
             sprite = cooker_sprite
-        elif kind == 13: # Chaise gauche
+        elif kind == 13: # frigo
             self.value = 5
             sprite = fridge_sprite
         else:
@@ -207,18 +218,29 @@ class Container(MovableObject):
         super().__init__(x, y, image=sprite,tile_size=tile_size, is_hard=False, map=map, is_container=True)
 
     def open(self):
-        if R.random() < 0.3:
-            self.map.play_effect("reward")
-            self.map.score += R.randint(1,10)
+        r = R.random()
+        if r > 0.3:
+            if r >= 0.8:
+                self.map.play_effect("firemen_siren")
+                self.map.freeze(30)
+            else:
+                self.map.play_effect("reward")
+                self.map.score += R.randint(5,25)
             self.map.add_particle_firework(self.rect.centerx, self.rect.bottom)
         self.kill()
 
 class FixObject(MovableObject):
-    def __init__(self, x=0, y=0, tile_size=32, map=None, object_type=0):
+    def __init__(self, x=0, y=0, tile_size=32, map=None, kind=0):
         image = None
-        if object_type == 0:
+        is_hard = True
+        if kind == 0:
             image = wall_sprite
-        super().__init__(x,y, image=image, tile_size=tile_size, map=None)
+        elif kind == 2:
+            image = red_wall_sprite
+        elif kind == 1:
+            image = woodBackGround_sprite
+            is_hard = False
+        super().__init__(x,y, image=image, tile_size=tile_size, map=None, is_hard=is_hard)
 
 
 class FireCore(MovableObject):
@@ -230,3 +252,24 @@ class FireCore(MovableObject):
         ite = self.iteration * dt * 10
         self.image = fires_sprite[int(ite % 6)]
         self.update_end()
+        
+
+class Ladder(Liftable):
+    def __init__(self, x=0, y=0, tile_size=32, map=None):
+        super().__init__(x, y, image=ladder_sprite, tile_size=tile_size, map=map)
+
+    def use(self):
+        self.map.add_ladder(self.pos.x, self.pos.y)
+        self.liftable = False
+        # self.map.play_effect("reward")
+        # self.map.add_particle_reward(self.rect.centerx, self.rect.centery)
+        self.kill()
+
+    def update_middle(self,dt = 1):
+        super().update_middle(dt=dt)
+        fire_collided = self.map.collide_with_tile(self,self.map.fire_tiles)
+        if(fire_collided[0]!=None):
+            self.kill()
+            self.map.add_particle_fire(self.rect.centerx, self.rect.centery)
+            self.map.play_effect("destruction")
+            

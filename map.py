@@ -1,12 +1,15 @@
 import pygame as pg
 from items.player import Player
-from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture,FixObject,FireCore
+from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture,FixObject, FireCore,Ladder
 import random as R
 import locate
 import particleEffect
 import os
 
 pg.mixer.init()
+
+def get_image(name, scale):
+    return pg.transform.scale(pg.image.load(os.path.join("res",f"{name}.png")), scale)
 
 def get_effect(name, volume):
     sound = pg.mixer.Sound(os.path.join("res","audio",f'{name}.wav'))
@@ -23,9 +26,13 @@ sound_throw = get_effect("throw", 0.5)
 sound_destruction = get_effect("destruction", 0.5)
 sound_explosion = get_effect("destruction", 0.5)
 sound_jump = get_effect("jump", 0.3)
+sound_reward = get_effect("reward", 0.3)
 sound_land = get_effect("land", 0.1)
+sound_tick = get_effect("tick", 0.1)
 
 music_background = get_music("sound", 0.1)
+
+score_background = get_image("score_ui", (200,40))
 
 
 tokens = {
@@ -38,7 +45,7 @@ tokens = {
     "40": "wall destructible",
     "1" : "tab1", "11" : "tab2", "21" : "tab3",
     "31": "chaise","41" : "table", "51" : "etagere",
-    "2" : "seau",
+    "2" : "seau", "21" : "echelle",
     "3" : "lit", "13" : "coffre" , "23" : "four" , "33" : "frigo",
     "4" : "fireplace",
     "5" : "spawn player",
@@ -64,12 +71,13 @@ def map_from_file(filename, tile_size=32):
                 pass
             elif token == "inner_empty":
                 new_destroyable_pack = True
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
             elif token == "ground":#Sol
-                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map,kind = 2))
                 new_destroyable_pack = True
 
             elif token == "wall":#Murs
-                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map))
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map,kind = 0))
                 new_destroyable_pack = True
 
             elif token == "wall destructible":#Murs cassables
@@ -85,43 +93,64 @@ def map_from_file(filename, tile_size=32):
                 map.add_tile(new_tile)
 
             elif token == "tab1": # Tableau tier 1
-                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 10))
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                if(R.randint(1,3)>1):
+                    map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 10))
                 new_destroyable_pack = True
             elif token == "tab2": # Tableau tier 2
-                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 11))
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                if(R.randint(1,3)>1):
+                    map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 11))
                 new_destroyable_pack = True
             elif token == "tab3": # Tableau tier 3
-                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 12))
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                if(R.randint(1,3)>1):
+                    map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 13))
                 new_destroyable_pack = True
-            elif token == "chaise": # Tableau tier 3
-                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 20))
+            elif token == "chaise": # Chaise
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                if(R.randint(1,3)>1):
+                    map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 20))
                 new_destroyable_pack = True
-            elif token == "table": # Tableau tier 3
-                map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 21))
+            elif token == "table": # Table
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                if(R.randint(0,3)>1):
+                    map.add_tile(Furniture(x,y,tile_size=tile_size,map=map, kind = 21))
                 new_destroyable_pack = True
 
-            elif token == "lit": # Contenur
-                map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=10))
+            elif token == "lit": # Lit
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                if(R.randint(0,5)>2):
+                    map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=10))
                 new_destroyable_pack = True
-            elif token == "coffre": # Contenur
-                map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=11))
+            elif token == "coffre": # Coffre-forts
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                if(R.randint(0,5)>2):
+                    map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=11))
                 new_destroyable_pack = True
-            elif token == "four": # Contenur
-                map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=12))
+            elif token == "four": # Fours
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                if(R.randint(0,5)>4):
+                    map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=12))
                 new_destroyable_pack = True
-            elif token == "frigo": # Contenur
-                map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=13))
+            elif token == "frigo": # Frigo
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                if(R.randint(0,5)>2):
+                    map.add_tile(Container(x,y,tile_size=tile_size,map=map, kind=13))
                 new_destroyable_pack = True
 
             elif token == "seau": # Seaux
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
                 map.add_tile(WaterBucket(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
 
             elif token == "echelle": # échelles
-                map.add_tile(Liftable(x,y,tile_size=tile_size,map=map))
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
+                map.add_tile(Ladder(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
 
             elif token == "fireplace": # incendie
+                map.add_tile(FixObject(x,y,tile_size=tile_size,map=map, kind=1))
                 map.add_tile(FireCore(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
 
@@ -165,8 +194,8 @@ class Map:
         self.safe_zone = 0
         self.freeze_cooldown = 0
         self.tile_size = tile_size
-        self.tiles = pg.sprite.Group()
         self.particles = []
+        self.tiles = pg.sprite.OrderedUpdates()
         self.fire_tiles = pg.sprite.Group()
         self.liftable_tiles = pg.sprite.Group()
         self.containers_tiles = pg.sprite.Group()
@@ -177,6 +206,7 @@ class Map:
         self.iteration = 0
         self.last_shake = -100
         self.player = Player(tile_size = tile_size, map=self)
+        music_background.play()
 
 
     def freeze(self,lap):
@@ -185,6 +215,8 @@ class Map:
     def update(self, screen, dt):
         #Gestion du compteur
         if(self.freeze_cooldown > 0):
+            if int(self.iteration % 2) == 0:
+                self.play_effect("tick")
             self.freeze_cooldown -= dt
         else:
             self.countdown -= dt
@@ -295,8 +327,16 @@ class Map:
         self.player.draw(screen, dt)
         for particle in self.particles:
             particle.draw(screen)
+        screen.blit(score_background,(0,0))
         self.countdown_locater.print(screen)
         self.score_locater.print(screen)
+    
+    def add_ladder(self, x, y):
+        pass
+
+    def add_particle_firework(self, x, y):
+        self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1,
+                        missile_size=self.tile_size//4, particule_size=self.tile_size//16))
 
     def add_particle_fire(self, x, y):
         self.particles.append(particleEffect.FireExplosion(x, y, size=self.tile_size//16).explode())
@@ -304,13 +344,12 @@ class Map:
     def add_particle_smoke(self, x, y):
         self.particles.append(particleEffect.Smoke(x,y, size=self.tile_size//3).explode())
 
-    def add_particle_firework(self, x, y):
-        self.particles.append(particleEffect.FireWork(x,y, timer=0.5, life_time=1,
-                        missile_size=self.tile_size//4, particule_size=self.tile_size//16))
-
     def add_particle_land(self, x, y):
         self.particles.append(particleEffect.LandExplosion(x, y, size=self.tile_size//16).explode())
 
+    def add_particle_reward(self, x, y):
+               self.particles.append(particleEffect.RewardExplosion(x, y, size=self.tile_size//16).explode())
+        
     def play_effect(self, effect):
         if effect == "jump":
             sound_jump.play()
@@ -324,3 +363,9 @@ class Map:
             sound_explosion.play()
         elif effect == "land":
             sound_land.play()
+        elif effect == "reward":
+            sound_reward.play()
+        elif effect == "tick":
+            sound_tick.play()
+        else:
+            print(f"No song {effect}")
