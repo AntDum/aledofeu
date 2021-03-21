@@ -13,6 +13,11 @@ def get_effect(name, volume):
     sound.set_volume(volume)
     return sound
 
+def get_music(name, volume):
+    pg.mixer.music.load(os.path.join("res","audio",f'{name}.mp3'))
+    pg.mixer.music.set_volume(volume)
+    return pg.mixer.music
+
 sound_fire_extinguish = get_effect("drop_water", 0.5)
 sound_throw = get_effect("throw", 0.5)
 sound_destruction = get_effect("destruction", 0.5)
@@ -20,6 +25,7 @@ sound_explosion = get_effect("destruction", 0.5)
 sound_jump = get_effect("jump", 0.3)
 sound_land = get_effect("land", 0.1)
 
+music_background = get_music("sound", 0.1)
 
 
 tokens = {
