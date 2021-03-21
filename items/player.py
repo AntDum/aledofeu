@@ -23,6 +23,7 @@ class Player(movable_object.MovableObject):
         self.touch_ground = True
         self.last_push = -100
         self.looking_right = True
+        self.land = 0
 
     def update(self, dt):
         self.vel.y += self.gravity * 50
@@ -39,10 +40,15 @@ class Player(movable_object.MovableObject):
         self.map.collide_block_with_tile(self, 'x')
         self.rect.y = self.pos.y
         if (self.map.collide_block_with_tile(self, 'y')) == "S":
-            self.touch_ground = True
+            if self.touch_ground == False:
+                self.map.play_effect("land")
+                self.touch_ground = True
+                self.land = self.iteration % 2
         else:
-            self.touch_ground = False
+            if self.iteration % 2 == self.land:
+                self.touch_ground = False
 
+        print(self.touch_ground)
         if(self.inventory):
             padding_y = -1 * self.tile_size
             self.inventory.pos.x = self.pos.x
@@ -92,10 +98,12 @@ class Player(movable_object.MovableObject):
         """
         If there is a furniture in the inventory, it's placed on the player position.
         """
-        self.inventory.has_gravity = True
-        self.inventory.vel.x = self.vel.x * 2
-        self.map.add_tile(self.inventory)
-        self.inventory = None
+        if self.inventory != None:
+            self.map.play_effect("throw")
+            self.inventory.has_gravity = True
+            self.inventory.vel.x = self.vel.x * 2
+            self.map.add_tile(self.inventory)
+            self.inventory = None
 
 
     def get_keys(self, fact_x, fact_y):
@@ -115,4 +123,5 @@ class Player(movable_object.MovableObject):
         if self.touch_ground:
             self.vel.y -= keys[pg.K_UP] * self.jump_force * fact_y
             if keys[pg.K_UP]:
+                self.map.play_effect("jump")
                 self.touch_ground = False

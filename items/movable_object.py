@@ -10,6 +10,7 @@ def get_image(name, scale):
 def get_image_fire(name, scale):
     return pg.transform.scale(pg.image.load(os.path.join("res","fire",f"{name}.png")), scale)
 
+
 wall_sprite = get_image("Wall", (TILES_SIZE,TILES_SIZE))
 woodBackGround_sprite = get_image("Wood_backGround", (TILES_SIZE,TILES_SIZE))
 chairLeft_sprite = get_image("chair_left", (TILES_SIZE,TILES_SIZE))
@@ -124,6 +125,7 @@ class WaterBucket(Liftable):
         fire_core.kill()
         self.kill()
         self.map.add_particle_smoke(fire_core.rect.centerx, fire_core.rect.centery)
+        self.map.play_effect("fire_extinguish")
 
     def update_middle(self, dt=1):
         super().update_middle(dt=dt)
@@ -170,6 +172,7 @@ class Furniture(Liftable):
         if(fire_collided[0]!=None):
             self.kill()
             self.map.add_particle_fire(self.rect.centerx, self.rect.centery)
+            self.map.play_effect("destruction")
             
         if(self.pos.x > self.map.safe_zone and not self.is_saved):
             self.get_saved()
