@@ -1,6 +1,6 @@
 import pygame as pg
 from items.player import Player
-from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture,FixObject
+from items.movable_object import MovableObject,Container,Liftable,WaterBucket,Furniture,FixObject,FireCore
 import random as R
 import locate
 
@@ -37,8 +37,6 @@ tokens = {
 }
 
 
-
-
 def map_from_file(filename, tile_size=32):
     """
     From a csv file, returns a map.
@@ -69,7 +67,7 @@ def map_from_file(filename, tile_size=32):
                 new_destroyable_pack = True
 
             elif token == "ground destructible": # Sol destructibles
-                new_tile = MovableObject(x,y,tile_size=tile_size,map=map)
+                new_tile = FixObject(x,y,tile_size=tile_size,map=map)
                 if(new_destroyable_pack):
                     map.destroyable_packages.append(pg.sprite.Group())
                     new_destroyable_pack = False
@@ -93,7 +91,7 @@ def map_from_file(filename, tile_size=32):
                 new_destroyable_pack = True
 
             elif token == "fireplace": # incendie
-                map.add_tile(MovableObject(x,y,tile_size=tile_size,map=map,is_fire=True, is_hard=False))
+                map.add_tile(FireCore(x,y,tile_size=tile_size,map=map))
                 new_destroyable_pack = True
 
             elif token == "safer": # Point de depot
@@ -142,6 +140,8 @@ class Map:
         self.destroyable_packages = []
         self.width_tile = 0
         self.height_tile = 0
+        self.iteration = 0
+        self.last_shake = -100
         self.player = Player(tile_size = tile_size, map=self)
 
 
@@ -159,12 +159,20 @@ class Map:
             i = R.randint(0,len(self.destroyable_packages)-1)
             for tile in self.destroyable_packages[i]:
                 tile.kill()
+            self.last_shake = self.iteration
+            
         #Update des éléments
         self.tiles.update(dt)
         self.player.update(dt)
         screen.update_camera(self.player)
         self.countdown_locater.center(screen.surface).move(y=-250)
         self.countdown_locater.change_text(str(int(self.countdown)))
+        
+        if (self.last_shake - self.iteration) * dt > -10 * dt:
+            screen.shake()
+        
+        self.iteration += 1
+        
         self.score_locater.change_text(f"Score : {self.score}")
         self.score_locater.render()
         self.countdown_locater.render()
