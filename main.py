@@ -61,8 +61,31 @@ def main():
         #update screen
         pg.display.flip()
 
-
+        #Création de l'écran de fin de partie
+    is_in_menu = True
+    new_game_wanted = False
+    play_again = Button("Rejouer")
+    play_again.move_to(200,200)
+    play_again.change_action(replay)
+    play_again.change_sprite(get_image("menu_button"),(300,300))
+    quit_game = Button("Quitter")
+    quit_game.change_action(do_not_replay)
+    quit_game.move_to(100,100)
+    while is_in_menu:
+        play_again.draw(screen.surface)
+        quit_game.draw(screen.surface)
+        pg.display.flip()
+        for event in pg.event.get(): # Recupere les events
+            if event.type == pg.QUIT: # Ferme le jeu quand on quitte
+                is_in_menu = False
+            if event.type == pg.MOUSEBUTTONDOWN:
+                mouse_pos = pg.mouse.get_pos()
+                if(play_again.is_pos_in(mouse_pos)):
+                    is_in_menu,new_game_wanted = play_again.get_pressed()
+                if(quit_game.is_pos_in(mouse_pos)):
+                    is_in_menu,new_game_wanted = quit_game.get_pressed()
     pg.quit() #quit le module pygame
+    return new_game_wanted
 
 
 main()
