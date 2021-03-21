@@ -22,10 +22,9 @@ def get_effect(name, volume):
     sound.set_volume(volume)
     return sound
 
-def get_music(name, volume):
+def set_music(name, volume):
     pg.mixer.music.load(os.path.join("res","audio",f'{name}.mp3'))
     pg.mixer.music.set_volume(volume)
-    return pg.mixer.music
 
 sound_fire_extinguish = get_effect("drop_water", 0.5)
 sound_throw = get_effect("throw", 0.5)
@@ -35,8 +34,6 @@ sound_jump = get_effect("jump", 0.3)
 sound_reward = get_effect("reward", 0.3)
 sound_land = get_effect("land", 0.1)
 sound_tick = get_effect("tick", 0.1)
-
-music_background = get_music("sound", 0.1)
 
 score_background = get_image("score_ui", (200,40))
 fire_background = get_image("fire_background", (250,250))
@@ -214,7 +211,8 @@ class Map:
         self.iteration = 0
         self.last_shake = -100
         self.player = Player(tile_size = tile_size, map=self)
-        music_background.play()
+        set_music("sound", 0.2)
+        pg.mixer.music.play(-1)
 
 
     def freeze(self,lap):
