@@ -166,7 +166,7 @@ class Map:
         self.tiles.update(dt)
         self.player.update(dt)
         screen.update_camera(self.player)
-        self.countdown_locater.center(screen.surface).move(y=-250)
+
         self.countdown_locater.change_text(str(int(self.countdown)))
 
         if (self.last_shake - self.iteration) * dt > -10 * dt:
@@ -176,6 +176,8 @@ class Map:
 
         self.score_locater.change_text(f"Score : {self.score}")
         self.score_locater.render()
+        self.countdown_locater.render()
+        self.countdown_locater.center(screen.surface).move(y=-240)
         self.countdown_locater.render()
 
 
