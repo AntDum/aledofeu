@@ -335,7 +335,7 @@ class Map:
         for particle in self.particles:
             particle.draw(screen)
         screen.blit(score_background,(0,0))
-        screen.blit(fire_background,())
+        screen.blit(fire_background,(screen.get_size()[0]-150,15))
         self.countdown_locater.print(screen)
         self.score_locater.print(screen)
     
