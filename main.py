@@ -2,6 +2,7 @@ import pygame as pg
 from screen import Screen
 from items import player
 from map import map_from_file
+from button import Button
 import os
 
 WIDTH = 800
@@ -9,22 +10,26 @@ HEIGHT = 600
 FPS_MAX = 60
 TILES_SIZE = 32
 
+def replay():
+    return False,True
+
+def do_not_replay():
+    return False,False
 
 def main():
     pg.init()
-
+    run = True
     screen = Screen(WIDTH, HEIGHT, TILES_SIZE)
     clock = pg.time.Clock()
 
     pg.display.set_caption("Aledofeu")
     background = pg.Surface([WIDTH, HEIGHT])
-    background.fill((135,206,235))
+    background.fill((200,200,200))
 
     screen.background = background
 
     screen.blit(background, (0,0))
 
-    pg.display.flip()
 
     map = map_from_file(os.path.join("niveaux", "lvl4.csv"), tile_size=TILES_SIZE)
 
@@ -32,7 +37,6 @@ def main():
 
 
     #Boucle du jeu
-    run = True
     while run:
         dt = clock.tick(FPS_MAX) / 1000 # connait le delta time entre les iterations
         fps = round(dt*(FPS_MAX**2),2) # connait les fps
@@ -62,6 +66,7 @@ def main():
         pg.display.flip()
 
         #Création de l'écran de fin de partie
+    #Création de l'écran de fin de partie
     is_in_menu = True
     new_game_wanted = False
     play_again = Button("Rejouer")
@@ -88,4 +93,6 @@ def main():
     return new_game_wanted
 
 
-main()
+playing = True
+while playing:
+    playing = main()

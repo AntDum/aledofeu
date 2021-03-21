@@ -213,7 +213,7 @@ def gen_level(filename):
 
 class Map:
     def __init__(self, tile_size=32):
-        self.countdown = 60
+        self.countdown = 3
         self.countdown_locater = locate.TextBox(font_size = 150)
         self.countdown_locater.change_font_from_file("terminal-grotesque_open",color = (0,0,0))
         self.score = 0
