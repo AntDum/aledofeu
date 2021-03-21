@@ -22,9 +22,9 @@ def main():
     screen = Screen(WIDTH, HEIGHT, TILES_SIZE)
     clock = pg.time.Clock()
 
-    pg.display.set_caption("Aledofeu")
+    pg.display.set_caption("Adledofeu")
     background = pg.Surface([WIDTH, HEIGHT])
-    background.fill((200,200,200))
+    background.fill((135,206,235))
 
     screen.background = background
 
@@ -52,7 +52,6 @@ def main():
 
         #update
         map.update(screen, dt)
-        
 
         #draw
         # pg.display.update(map.draw(screen))
@@ -64,8 +63,11 @@ def main():
 
         #update screen
         pg.display.flip()
-    #Création de l'écran de fin de partie
-    is_in_menu = True
+
+
+    # Boucle de
+    screen.blit(background, (0,0))
+    is_in_menu = False
     new_game_wanted = False
     play_again = Button("Rejouer")
     play_again.move_to(200,200)
@@ -86,8 +88,11 @@ def main():
                     is_in_menu,new_game_wanted = play_again.get_pressed()
                 if(quit_game.is_pos_in(mouse_pos)):
                     is_in_menu,new_game_wanted = quit_game.get_pressed()
+
+
     pg.quit() #quit le module pygame
     return new_game_wanted
+
 
 
 playing = True
