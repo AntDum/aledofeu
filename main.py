@@ -17,6 +17,7 @@ def main():
     clock = pg.time.Clock()
 
     pg.display.set_caption("Adledofeu")
+    pg.display.set_icon(pg.image.load(os.path.join("res","ico.png")))
     background = pg.Surface([WIDTH, HEIGHT])
     background.fill((135,206,235))
 
